@@ -14,7 +14,6 @@ import { Input } from "@/components/ui/input";
 export default function ProfilePage() {
   const dispatch = useAppDispatch();
   const [pageIndex] = useState(1);
-  const [gender, setGender] = useState("Female");
   const genders = ["Male", "Female", "Others"];
 
   useEffect(() => {
@@ -62,10 +61,6 @@ export default function ProfilePage() {
         ?.data as ProfileDataType
   );
 
-  console.log(profileData);
-
-  
-
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
@@ -97,21 +92,16 @@ export default function ProfilePage() {
             <p className="text-xl font-bold">{profileData?.user.name}</p>
             <p className="text-gray-400">{profileData?.user.phoneNumber}</p>
             <div className="flex">
-              <Link
-                href="/resetPassword"
-                className="text-left p-2 rounded bg-blue-500 hover:bg-blue-600 mt-4"
-              >
-                <span>Reset</span>
+              <Link href="/resetPassword">
+                <button className="flex -ml-20 text-white bg-blue-500 rounded-md text-center content-center mt-4 p-2">Reset</button>
               </Link>
-              <button className="ml-8">Logout</button>
-            </div>
+              <button className="flex  text-white bg-blue-500 rounded-md text-center content-center mt-4 p-2 ">Logout</button>
+              </div>
           </div>
 
           {/* Form Section */}
           <div className="bg-gray-800 p-6 rounded-md w-2/3">
-            <form
-            onSubmit={formik.handleSubmit}
-            className="space-y-4">
+            <form onSubmit={formik.handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm text-gray-400 mb-1">
@@ -128,19 +118,23 @@ export default function ProfilePage() {
 
                 <div>
                   <label className="block text-sm text-gray-400 mb-1">
-                  phone Number
+                    phone Number
                   </label>
                   <Input
                     className="text-white"
                     placeholder="phoneNumber"
                     type="text"
                     {...formik.getFieldProps("phoneNumber")}
-                    error={formik.touched.phoneNumber ? formik.errors.phoneNumber : undefined}
+                    error={
+                      formik.touched.phoneNumber
+                        ? formik.errors.phoneNumber
+                        : undefined
+                    }
                   />
                 </div>
                 <div>
                   <label className="block text-sm text-gray-400 mb-1">
-                  email
+                    email
                   </label>
                   <Input
                     className="text-white"
@@ -150,7 +144,6 @@ export default function ProfilePage() {
                     error={formik.touched.name ? formik.errors.name : undefined}
                   />
                 </div>
-            
 
                 <div>
                   <label className="block text-sm text-gray-400 mb-1">
@@ -166,8 +159,10 @@ export default function ProfilePage() {
                           type="radio"
                           name="gender"
                           value={option}
-                          checked={gender === option}
-                          onChange={() => setGender(option)}
+                          checked={formik.values.gender === option}
+                          onChange={() =>
+                            formik.setFieldValue("gender", option)
+                          }
                           className="mr-2"
                         />
                         {option}
@@ -176,8 +171,6 @@ export default function ProfilePage() {
                   </div>
                 </div>
               </div>
-
-              {/* Gender Selection Section */}
 
               <div className="flex justify-end">
                 <button

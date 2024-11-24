@@ -38,13 +38,12 @@ export default function LoginForm() {
       email: values.email,
       password: values.password,
       redirect: false,
-      callbackUrl: "/profile", // Use the extracted callback URL
+      callbackUrl: "/profile", 
     })
       .then(async (response: any) => {
         if (response?.error) {
           toast.error("Login Failed! Please check your credentials.");
         } else {
-          // await session.update();
           router.replace("/"); // Redirect to the callback URL
         }
       })
@@ -65,7 +64,7 @@ export default function LoginForm() {
 
   return (
     <div className="flex h-screen">
-      <div className="w-1/3 h-full relative">
+      <div className="w-1/3 h-full relative ">
         <Image
           src="/assets/login.png"
           alt="Login background"
@@ -79,7 +78,7 @@ export default function LoginForm() {
 
       <div className="w-2/3 bg-[#222222] flex items-center justify-center h-full">
         <div className="max-w-md w-full space-y-8 text-center">
-          <h2 className="text-4xl font-bold text-blue-500 font-helvetica">
+          <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl font-bold text-blue-500 font-helvetica">
             QuickConnect
           </h2>
           <form
@@ -90,11 +89,13 @@ export default function LoginForm() {
             }}
           >
             <Input
+            className="text-white"
               placeholder="Email Address"
               error={formik.touched.email ? formik.errors.email : undefined}
               {...formik.getFieldProps("email")}
             />
             <Input
+            className="text-white"
               placeholder="Password"
               type="password"
               error={
@@ -115,3 +116,4 @@ export default function LoginForm() {
     </div>
   );
 }
+

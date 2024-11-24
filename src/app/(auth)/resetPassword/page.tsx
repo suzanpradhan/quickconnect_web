@@ -28,8 +28,7 @@ const RequestResetPassword = () => {
     }
   };
 
-  const onSubmit = async (values: resetPasswordValues) => {
-    console.log("here", values);
+  const onSubmit = async (values: resetPasswordValues) => { 
   
     try {
       const result = await dispatch(

@@ -15,27 +15,19 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  if (token) {
-    // Authenticated user
-    if (pathname === "/" || pathname === "/login") {
-      return NextResponse.redirect(new URL("/profile", req.url));
-    }
-    return NextResponse.next();
-  } else {
-    // Unauthenticated user
-    if (pathname === "/" || pathname === "/profile") {
-      return NextResponse.redirect(
-        new URL(
-          `/login?callback=${encodeURIComponent(req.url)}`,
-          req.nextUrl.origin
-        )
-      );
-    }
-    if (pathname === "/login") {
-      return NextResponse.next();
-    }
+  // Redirect authenticated users from `/` or `/login` to `/profile`
+  if (token && (pathname === "/" || pathname === "/login")) {
+    return NextResponse.redirect(new URL("/profile", req.url));
   }
 
+  // Redirect unauthenticated users from `/` or `/profile` to `/login`
+  if (!token && (pathname === "/" || pathname === "/profile")) {
+    return NextResponse.redirect(
+      new URL(`/login?callback=${encodeURIComponent(req.url)}`, req.nextUrl.origin)
+    );
+  }
+
+  // Allow authenticated users or access to `/login`
   return NextResponse.next();
 }
 

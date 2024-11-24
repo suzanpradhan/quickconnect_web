@@ -31,11 +31,7 @@ const Register = () => {
     }
   };
 
-  console.log("here", process.env.NEXT_PUBLIC_SERVER_URL);
-
   const onSubmit = async (values: RegisterFormInputs) => {
-    console.log("here", values);
-
     try {
       const result = await dispatch(
         authApi.endpoints.register.initiate(values)
@@ -79,8 +75,8 @@ const Register = () => {
 
       <div className="w-2/3 bg-[#222222] flex items-center justify-center h-full">
         <div className="max-w-md w-full space-y-8 text-center">
-          <h2 className="text-4xl font-bold text-center text-blue-500 font-helvetica">
-            QuickConnect
+        <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl font-bold text-blue-500 font-helvetica">
+        QuickConnect
           </h2>
 
           <form
@@ -91,14 +87,14 @@ const Register = () => {
             }}
           >
             <Input
-              className="text-white mt-4"
+              className="text-white "
               placeholder="Enter Your Name"
                type="name"
               error={formik.touched.name ? formik.errors.name : undefined}
               {...formik.getFieldProps("name")}
             />
             <Input
-              className="text-white mt-4"
+              className="text-white "
               placeholder="Enter Your Email"
               type="email"
               error={formik.touched.email ? formik.errors.email : undefined}
@@ -106,7 +102,7 @@ const Register = () => {
             />
 
             <Input
-              className="text-white mt-4"
+              className="text-white "
               placeholder="Enter Your Password"
               type="password"
               error={
@@ -115,23 +111,24 @@ const Register = () => {
               {...formik.getFieldProps("password")}
             />
             <Input
-              className="text-white mt-4"
-              placeholder="Confirm Your Password" // Correct placeholder
-              type="password" // Changed to type="password"
+              className="text-white "
+              placeholder="Confirm Your Password" 
+              type="password" 
               error={
                 formik.touched.confirmPassword
                   ? formik.errors.confirmPassword
                   : undefined
               }
-              {...formik.getFieldProps("confirmPassword")} // Use correct field name
+              {...formik.getFieldProps("confirmPassword")} 
             />
             <button
               type="submit"
               disabled={isLoading}
               className="w-full flex justify-center py-2 px-4 border border-transparent text-sm text-black bg-[#169AD6] font-helvetica font-normal"
             >
-              {isLoading ? "Loading..." : "Register"} {/* Change button label to Register */}
+              {isLoading ? "Loading..." : "Register"} 
             </button>
+            
           </form>
         </div>
       </div>

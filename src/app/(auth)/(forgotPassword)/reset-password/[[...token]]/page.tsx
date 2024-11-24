@@ -18,7 +18,6 @@ const Page = () => {
   const router = useRouter();
   const searchParams = useParams();
   const resetToken = searchParams.token?.[0]
-  console.log("searchParams", searchParams)
   const dispatch = useAppDispatch();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -59,8 +58,11 @@ const Page = () => {
     }
   };
 
+  useEffect(() => {
+    validateToken(resetToken ?? null); 
+  }, [resetToken]);
+
   const onSubmit = async (values: newPasswordFormValues) => {
-    console.log("here")
     if (!resetToken) {
       toast.error(
         "No reset token found. Please request a new password reset."
@@ -80,7 +82,6 @@ const Page = () => {
 
       if ("data" in result) {
         toast.success("Password updated successfully! Please login.");
-        // router.push("/login");
       } else {
         toast.error("Failed to update password. Please try again.");
       }
@@ -104,7 +105,6 @@ const Page = () => {
     validate: validateForm,
   });
 
-  console.log(formik.values.resetToken)
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-900">
