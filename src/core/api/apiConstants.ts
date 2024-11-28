@@ -21,13 +21,13 @@ export async function setHeaders(headers: Headers) {
 
 export const  apiPaths = {
   serverUrl: process.env.NEXT_PUBLIC_SERVER_URL,
-  baseUrl: process.env.NEXT_PUBLIC_SERVER_URL + "/",
-  loginUrl: "auth/signin",
-  registerUrl: "auth/signup",
-  myProfileUrl: "auth/userInfo",
-  resetPasswordUrl: "auth/changePassword",
-  forgotPasswordUrl:"auth/forgotPassword",
-  createNewPasswordUrl:"auth/createNewPassword",
-  updateProfileUrl:"auth/edictUserInfo"
+  baseUrl: process.env.NEXT_PUBLIC_SERVER_URL + "/api",
+  loginUrl: "/signin",
+  registerUrl: "/signup",
+  myProfileUrl: "/userInfo",
+  resetPasswordUrl: "/changePassword",
+  forgotPasswordUrl:"/forgotPassword",
+  createNewPasswordUrl:"/createNewPassword",
+  updateProfileUrl:"/edictUserInfo",
 };
   

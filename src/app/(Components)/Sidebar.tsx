@@ -11,11 +11,10 @@ export default function Sidebar() {
 
         <div className="space-y-4">
           {/* Rooms */}
-          <div className="flex items-center gap-4">
-            <Users className="w-6 h-6 text-blue-500" />
+          <div className="flex items-center gap-4 w-full text-left p-2 rounded bg-blue-500 hover:bg-blue-600">
+            <Users className="w-6 h-6 text-white" />
             <Link
               href="/rooms"
-              className="w-full text-left p-2 rounded bg-blue-500 flex items-center hover:bg-blue-600"
             >
               <span>Rooms</span>
             </Link>
@@ -23,7 +22,7 @@ export default function Sidebar() {
 
           {/* Organization */}
           <div className="flex items-center gap-4">
-            <Building2 className="w-6 h-6 text-gray-400" />
+            <Building2 className="w-6 h-6 text-white" />
             <Link
               href="/organization"
               className="w-full text-left p-2 rounded flex items-center hover:bg-gray-700"
@@ -34,7 +33,7 @@ export default function Sidebar() {
 
           {/* My Account */}
           <div className="flex items-center gap-4">
-            <UserCircle className="w-6 h-6 text-gray-400" />
+            <UserCircle className="w-6 h-6 text-white" />
             <Link
               href="/my-account"
               className="w-full text-left p-2 rounded flex items-center hover:bg-gray-700"

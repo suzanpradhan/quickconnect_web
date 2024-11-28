@@ -7,8 +7,8 @@ import { useRouter } from "next/navigation";
 import { z, ZodError } from "zod";
 import { useState } from "react";
 import { nonempty } from "@/core/utils/formUtils";
-import { toast } from "react-toastify";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
 
 const loginSchema = z.object({
   email: z.string().pipe(nonempty),
@@ -20,6 +20,7 @@ type LoginFormInputs = z.infer<typeof loginSchema>;
 export default function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { toast } = useToast();
 
   const validateForm = (values: LoginFormInputs) => {
     try {
@@ -38,13 +39,18 @@ export default function LoginForm() {
       email: values.email,
       password: values.password,
       redirect: false,
-      callbackUrl: "/profile", 
+      callbackUrl: "/profile",
     })
       .then(async (response: any) => {
         if (response?.error) {
-          toast.error("Login Failed! Please check your credentials.");
+          toast({
+            variant: "destructive",
+
+            title: "Login faild.",
+            description: "There was a problem.",
+          });
         } else {
-          router.replace("/"); // Redirect to the callback URL
+          router.replace("/");
         }
       })
       .catch((errorResponse) => {});
@@ -89,13 +95,13 @@ export default function LoginForm() {
             }}
           >
             <Input
-            className="text-white"
+              className="text-white  "
               placeholder="Email Address"
               error={formik.touched.email ? formik.errors.email : undefined}
               {...formik.getFieldProps("email")}
             />
             <Input
-            className="text-white"
+              className="text-white"
               placeholder="Password"
               type="password"
               error={
@@ -116,4 +122,3 @@ export default function LoginForm() {
     </div>
   );
 }
-

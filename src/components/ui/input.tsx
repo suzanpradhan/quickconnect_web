@@ -18,10 +18,10 @@ const Input = React.forwardRef<
     <input
       type={type}
       className={cn(
-        'flex h-12 w-full rounded-md px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-grayText disabled:cursor-not-allowed disabled:opacity-50',
+        'autofill flex h-12 w-full rounded-md px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-grayText disabled:cursor-not-allowed disabled:opacity-50',
         error ? '!border-2 !border-red-500' : '',
         variant === 'dark'
-          ? 'bg-blackShade'
+          ? 'bg-[#222222] '
           : 'border border-border bg-transparent',
         className
       )}

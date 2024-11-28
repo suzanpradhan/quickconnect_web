@@ -14,11 +14,13 @@ import {
 import { apiPaths } from "@/core/api/apiConstants";
 import { useFormik } from "formik";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
 
 const Register = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast()
 
   const validateForm = (values: RegisterFormInputs) => {
     try {
@@ -41,7 +43,10 @@ const Register = () => {
         console.log("Registration successful!", result.data);
         router.push("/login");
       } else if ("error" in result) {
-        console.error("Registration failed:", result.error);
+        toast({
+          title: "Login faild.",
+          description: "There was a problem.",
+        })
       }
     } catch (error) {
       console.error("An error occurred during registration:", error);
@@ -87,7 +92,7 @@ const Register = () => {
             }}
           >
             <Input
-              className="text-white "
+              className="text-white bg-[#222222] focus:outline-none"
               placeholder="Enter Your Name"
                type="name"
               error={formik.touched.name ? formik.errors.name : undefined}
@@ -102,7 +107,7 @@ const Register = () => {
             />
 
             <Input
-              className="text-white "
+              className="text-white bg-[#222222] focus:outline-none"
               placeholder="Enter Your Password"
               type="password"
               error={
@@ -111,7 +116,7 @@ const Register = () => {
               {...formik.getFieldProps("password")}
             />
             <Input
-              className="text-white "
+              className="text-white bg-[#222222] focus:outline-none"
               placeholder="Confirm Your Password" 
               type="password" 
               error={

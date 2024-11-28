@@ -10,7 +10,7 @@ import { newPasswordApi } from '@/modules/createNewPassword/newPasswordApi';
 export const store = configureStore({
   reducer: {
     [baseApi.reducerPath]: baseApi.reducer,  
-    [profileApi.reducerPath]: profileApi.reducer, 
+    // [profileApi.reducerPath]: profileApi.reducer, 
     [forgotApi.reducerPath]: forgotApi.reducer, 
     [newPasswordApi.reducerPath]: newPasswordApi.reducer, 
     
