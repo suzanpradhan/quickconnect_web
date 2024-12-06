@@ -8,6 +8,7 @@ import { usePathname } from "next/navigation";
 import SessionWrapper from "./SessionWrapper";
 import "react-toastify/dist/ReactToastify.css";
 import { Toaster } from "@/components/ui/toaster";
+import { ToastProvider } from "@/components/ui/toast";
 
 export default function RootLayout({
   children,
@@ -27,15 +28,17 @@ export default function RootLayout({
       <body className="flex min-h-screen">
         <SessionWrapper>
           {!hideSidebarPaths.includes(pathname) && (
-            <div>
+            <ToastProvider>
               <Sidebar />
-            </div>
+            </ToastProvider>
           )}
           <Provider>
             <main className="flex-1 bg-gray-100">{children}</main>
           </Provider>
-          <Toaster />
-        </SessionWrapper>
+          <div className="fixed top-0 right-0 m-4 z-50">
+            <Toaster />
+          </div>
+        </SessionWrapper> 
       </body>
     </html>
   );

@@ -69,8 +69,8 @@ export default function LoginForm() {
   });
 
   return (
-    <div className="flex h-screen">
-      <div className="w-1/3 h-full relative ">
+    <div className="flex h-screen ">
+      <div className="w-1/3 h-full relative  ">
         <Image
           src="/assets/login.png"
           alt="Login background"
@@ -95,7 +95,7 @@ export default function LoginForm() {
             }}
           >
             <Input
-              className="text-white  "
+              className="text-white"
               placeholder="Email Address"
               error={formik.touched.email ? formik.errors.email : undefined}
               {...formik.getFieldProps("email")}

@@ -19,7 +19,7 @@ const imageFile = z.instanceof(File).refine(
   }
 );
 
-export interface ProfileType<t> {
+export interface ProfileType {
   id: string;
   avatar: File | string | null; 
   name: string;
@@ -41,6 +41,6 @@ export const profileSchema = z.object({
 export type ProfileFormValues = z.infer<typeof profileSchema>;
 
 export interface ProfileDataType {
-  user: ProfileType<number>;
+    userInfo: ProfileType;
 }
 

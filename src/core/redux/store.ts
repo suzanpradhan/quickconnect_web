@@ -6,6 +6,7 @@ import { profileApi } from '@/modules/profile/profileApi';
 import { rtkQueryErrorLogger } from '../api/apiMiddleware';
 import { forgotApi } from '@/modules/forgotPassword/forgotAPi';
 import { newPasswordApi } from '@/modules/createNewPassword/newPasswordApi';
+import { chatApi } from '@/modules/chatList/chatListApi';
 
 export const store = configureStore({
   reducer: {
@@ -13,6 +14,7 @@ export const store = configureStore({
     // [profileApi.reducerPath]: profileApi.reducer, 
     [forgotApi.reducerPath]: forgotApi.reducer, 
     [newPasswordApi.reducerPath]: newPasswordApi.reducer, 
+    
     
 
   },

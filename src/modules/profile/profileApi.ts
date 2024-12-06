@@ -7,9 +7,9 @@ import { toast } from "react-toastify";
 
 export const profileApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getProfileByToken: builder.query<ProfileDataType, number>({
-      query: (pageIndex) => ({
-        url: `${apiPaths.myProfileUrl}?page=${pageIndex}`,
+    getProfileByToken: builder.query<ProfileDataType, void>({
+      query: () => ({
+        url: `${apiPaths.myProfileUrl}`,
         method: "GET",
       }),
     }),

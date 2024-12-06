@@ -24,10 +24,12 @@ export const  apiPaths = {
   baseUrl: process.env.NEXT_PUBLIC_SERVER_URL + "/api",
   loginUrl: "/signin",
   registerUrl: "/signup",
-  myProfileUrl: "/userInfo",
+  myProfileUrl: "/userInfo",  
   resetPasswordUrl: "/changePassword",
   forgotPasswordUrl:"/forgotPassword",
   createNewPasswordUrl:"/createNewPassword",
   updateProfileUrl:"/edictUserInfo",
+  ChatDetailUrl: "/user",
+  
 };
   
