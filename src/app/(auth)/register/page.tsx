@@ -13,8 +13,9 @@ import {
 } from "@/modules/register/registerType";
 import { apiPaths } from "@/core/api/apiConstants";
 import { useFormik } from "formik";
-import { Input } from "@/components/ui/input";
+
 import { useToast } from "@/hooks/use-toast";
+import { Input } from "@/components/ui/input";
 
 const Register = () => {
   const dispatch = useAppDispatch();

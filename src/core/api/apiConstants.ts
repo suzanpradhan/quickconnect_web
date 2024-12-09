@@ -18,7 +18,6 @@ export async function setHeaders(headers: Headers) {
   headers.set("accept", "application/json");
   return headers;
 }
-
 export const  apiPaths = {
   serverUrl: process.env.NEXT_PUBLIC_SERVER_URL,
   baseUrl: process.env.NEXT_PUBLIC_SERVER_URL + "/api",
@@ -30,6 +29,7 @@ export const  apiPaths = {
   createNewPasswordUrl:"/createNewPassword",
   updateProfileUrl:"/edictUserInfo",
   ChatDetailUrl: "/user",
-  
+  CreatRoomsUrl:"/create-room",
+  JoinRoomUrl:"/join-room"
 };
   

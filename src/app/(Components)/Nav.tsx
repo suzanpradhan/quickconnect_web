@@ -1,26 +1,115 @@
 "use client";
-import React, { useState } from "react";
 import {
   AlignEndVertical,
   ChevronUp,
   ChevronDown,
-  Search,
-  Plus,
-  UserPen,
-  FileChartColumnIncreasing,
   User,
   HelpCircle,
   LogOut,
-  Lock,
   Key,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useAppDispatch, useAppSelector } from "@/core/redux/clientStore";
+import { useEffect, useState } from "react";
+import profileApi from "@/modules/profile/profileApi";
+import { ProfileDataType, ProfileFormValues } from "@/modules/profile/profileType";
+import { useToast } from "@/hooks/use-toast";
+import { RootState } from "@/core/redux/store";
+import { useFormik } from "formik";
+import { apiPaths } from "@/core/api/apiConstants";
 
 export default function Navbar() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [avatar, setAvatar] = useState<File | null>(null);
+  const dispatch = useAppDispatch();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await dispatch(
+          profileApi.endpoints.getProfileByToken.initiate()
+        );
+        console.log("API Response:", response);
+      } catch (error) {
+        console.error("Failed to fetch profile:", error);
+        if (error instanceof Error) {
+          console.error("Error message:", error.message);
+        }
+      }
+    };
+    fetchData();
+  }, [dispatch]);
+
+  // Handle file change for avatar upload
+  const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files ? event.target.files[0] : null;
+    if (file) {
+      setAvatar(file); // Set the selected file in the state
+      formik.setFieldValue("avatar", file); // Manually update Formik field value for avatar
+    }
+  };
+
+  // Form submission for profile update
+  const onSubmit = async (values: ProfileFormValues) => {
+    console.log("Updating profile with values:", values);
+    try {
+      const result = await dispatch(
+        profileApi.endpoints.updateProfileByToken.initiate({
+          name: values.name,
+          phoneNumber: values.phoneNumber,
+          gender: values.gender,
+          avatar: avatar ?? null, 
+        })
+      );
+
+      if ("data" in result) {
+        toast({
+          title: "Updated profile successfully.",
+          description: "Updated profile successfully.",
+        });
+      } else if ("error" in result) {
+        toast({
+          variant: "destructive",
+          title: "Profile update failed.",
+          description: "There was a problem.",
+        });
+      }
+    } catch (error) {
+      console.error("An error occurred during profile update:", error);
+    }
+  };
+
+  // Access profile data from Redux store
+  const profileData = useAppSelector(
+    (state: RootState) =>
+      state.baseApi.queries[`getProfileByToken(undefined)`]
+        ?.data as ProfileDataType
+  );
+
+  // Formik setup for form handling
+  const formik = useFormik({
+    enableReinitialize: true,
+    initialValues: {
+      name: profileData?.userInfo?.name ?? "",
+      phoneNumber: profileData?.userInfo?.phoneNumber ?? "",
+      email: profileData?.userInfo?.email ?? "",
+      gender: profileData?.userInfo?.gender ?? "Female",
+      avatar: avatar ?? null,
+    },
+    onSubmit,
+    validateOnChange: true,
+  });
+
+  // Ensure that avatar is either a valid string or null
+  const avatarSrc = avatar
+    ? URL.createObjectURL(avatar) // Use avatar file if present
+    : profileData?.userInfo?.avatar
+    ? `${apiPaths.baseUrl}/${profileData?.userInfo.avatar}`
+    : ""; // Fallback to default image if no avatar is available
 
   return (
-    <div className="bg-gray-100 min-h-screen">
+    <div className="bg-gray-100">
       {/* Header Section */}
       <div className="bg-white shadow">
         <div className="flex flex-col sm:flex-row justify-between items-center p-8 space-y-4 sm:space-y-0">
@@ -36,10 +125,18 @@ export default function Navbar() {
           <div className="relative flex items-center space-x-4 justify-center sm:justify-end">
             {/* User Avatar */}
             <Avatar className="h-10 w-10">
-              <AvatarImage src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8YXZhdGFyfGVufDB8fDB8fHww" />
-              <AvatarFallback>B</AvatarFallback>
+              <AvatarImage src={avatarSrc} />
+              <AvatarFallback>
+                {profileData?.userInfo?.name
+                  ? profileData.userInfo.name[0].toUpperCase()
+                  : "U"}
+              </AvatarFallback>
             </Avatar>
-            <p className="text-lg text-gray-500">Bishnu Silwal</p>
+
+            {/* Dynamic Name */}
+            <p className="text-lg text-gray-500">
+              {profileData?.userInfo?.name || "Guest"}
+            </p>
 
             {/* Dropdown Toggle */}
             {isDropdownOpen ? (
@@ -71,8 +168,8 @@ export default function Navbar() {
                     Reset
                   </li>
                   <li className="flex items-center px-4 py-2 bg-red-500 hover:bg-red-800 cursor-pointer rounded-md">
-                    <LogOut className="mr-2 text-white " size={18} />
-                    <p className="text-white"> Sign Out</p>
+                    <LogOut className="mr-2 text-white" size={18} />
+                    <p className="text-white">Sign Out</p>
                   </li>
                 </ul>
               </div>
@@ -80,8 +177,6 @@ export default function Navbar() {
           </div>
         </div>
       </div>
-
-      
     </div>
   );
 }
