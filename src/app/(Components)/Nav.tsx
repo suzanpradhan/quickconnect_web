@@ -17,12 +17,22 @@ import { useToast } from "@/hooks/use-toast";
 import { RootState } from "@/core/redux/store";
 import { useFormik } from "formik";
 import { apiPaths } from "@/core/api/apiConstants";
+import { useRouter } from "next/navigation";
 
 export default function Navbar() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [avatar, setAvatar] = useState<File | null>(null);
   const dispatch = useAppDispatch();
   const { toast } = useToast();
+  const router = useRouter();
+
+  const handleHouseClick = () => {
+    router.push("/profile");
+  };
+
+  const Reset = () => {
+    router.push("/resetPassword");
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -155,18 +165,22 @@ export default function Navbar() {
             {isDropdownOpen && (
               <div className="absolute top-full right-0 mt-2 bg-white shadow-lg rounded-md w-48 z-10">
                 <ul className="py-2 text-sm text-gray-700">
-                  <li className="flex items-center px-4 py-2 hover:bg-gray-300 cursor-pointer">
+                  <button
+                   onClick={handleHouseClick}
+                   className="flex items-center px-4 py-2 hover:bg-gray-300 cursor-pointer">
                     <User className="mr-2 text-gray-500" size={18} />
                     Profile
-                  </li>
+                  </button>
                   <li className="flex items-center px-4 py-2 hover:bg-gray-300 cursor-pointer">
                     <HelpCircle className="mr-2 text-gray-500" size={18} />
                     Help Center
                   </li>
-                  <li className="flex items-center px-4 py-2 hover:bg-gray-300 cursor-pointer">
+                  <button
+                    onClick={Reset}
+                   className="flex items-center px-4 py-2 hover:bg-gray-300 cursor-pointer">
                     <Key className="mr-2 text-gray-500" size={18} />
                     Reset
-                  </li>
+                  </button>
                   <li className="flex items-center px-4 py-2 bg-red-500 hover:bg-red-800 cursor-pointer rounded-md">
                     <LogOut className="mr-2 text-white" size={18} />
                     <p className="text-white">Sign Out</p>

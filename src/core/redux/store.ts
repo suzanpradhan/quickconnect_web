@@ -5,16 +5,17 @@ import { profileApi } from '@/modules/profile/profileApi';
 import { rtkQueryErrorLogger } from '../api/apiMiddleware';
 import { forgotApi } from '@/modules/forgotPassword/forgotAPi';
 import { newPasswordApi } from '@/modules/createNewPassword/newPasswordApi';
+import messageApi from '@/modules/create-message/createMessageApi';
 
 export const store = configureStore({
   reducer: {
     [baseApi.reducerPath]: baseApi.reducer,  
-    
     [forgotApi.reducerPath]: forgotApi.reducer, 
     [newPasswordApi.reducerPath]: newPasswordApi.reducer, 
-    
-    
 
+
+
+    
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()

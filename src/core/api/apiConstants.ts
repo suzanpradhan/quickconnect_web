@@ -30,6 +30,8 @@ export const  apiPaths = {
   updateProfileUrl:"/edictUserInfo",
   ChatDetailUrl: "/user",
   CreatRoomsUrl:"/create-room",
-  JoinRoomUrl:"/join-room"
+  JoinRoomUrl:"/join-room",
+  MessageUrl:"/messages",
+SendmessageUrl:"/send-message"
 };
   

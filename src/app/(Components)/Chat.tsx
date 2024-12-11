@@ -1,98 +1,108 @@
-"use client"
-import React from "react";
-import { PencilOff, EllipsisVertical } from "lucide-react";
+"use client";
+import React, { useState } from "react";
+import { Cross, MessageSquare, X } from "lucide-react"; // Message icon from Lucide
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useState } from "react";
 
+export default function ChatSidebar() {
+  const [isOpen, setIsOpen] = useState(false);
 
-export default function Chat() {
+  const toggleSidebar = () => {
+    setIsOpen((prev) => !prev);
+  };
+
   return (
-    <div className="bg-black bg-opacity-50 w-1/3  h-screen rounded-md">
-      {/* Top Section */}
-      <div className="bg-blue-900 flex h-14 justify-evenly w-96 items-center ml-10 rounded-xl opacity-80- mt-4 ">
-        <div>
-          <p className="text-white text-sm font-bold">
-            12 : 30 <br /> before close
-          </p>
-        </div>
-        <div className="border-b border-[1px] border-white h-full"></div>
-        <p className="text-white">Confirm Attendance</p>
-        <PencilOff className="text-white" />
-        <EllipsisVertical className="text-white" />
-      </div>
+    <div className="relative h-screen bg-gray-100">
+      {/* Message Icon */}
+      <button
+        onClick={toggleSidebar}
+        className=" bg-blue-600 text-white p-2 rounded-full hover:bg-blue-500"
+      >
+        <MessageSquare size={24} />
+      </button>
 
-      {/* Static Chat Messages */}
-      <div>
-        {/* First Message */}
-        <div className="flex mt-10 ml-10">
+      {/* Sidebar */}
+      <div
+        className={`fixed top-0 right-0 h-screen w-80 bg-black text-white transform ${
+          isOpen ? "translate-x-0" : "translate-x-full"
+        } transition-transform duration-300 shadow-lg flex flex-col`}
+      >
+        {/* Sidebar Header */}
+        <div className="bg-blue-900 p-4 flex justify-between items-center">
+          <h2 className="text-lg font-bold">Chat</h2>
+          <button
+            onClick={toggleSidebar}
+            className="text-white hover:text-gray-300"
+          >
+      <X />
+          </button>
+        </div>
+
+        {/* Chat Content */}
+        <div className="flex-grow overflow-y-auto p-4">
+          {/* Message 1 */}
+          <div className="flex mb-4">
+            <Avatar className="w-10 h-10">
+              <AvatarImage
+                src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8YXZhdGFyfGVufDB8fDB8fHww"
+                alt="Profile Picture"
+              />
+              <AvatarFallback>CN</AvatarFallback>
+            </Avatar>
+            <div className="ml-4">
+              <h4 className="font-bold">Bishnu Silwal</h4>
+              <p className="text-gray-400 text-sm">Everything is possible</p>
+            </div>
+          </div>
+
+          {/* Message 2 */}
+          <div className="flex justify-end mb-4">
+            <div className="flex flex-col items-end">
+              <div className="flex items-center">
+                <h4 className="font-bold">You</h4>
+                <p className="text-gray-400 text-sm pl-4">Just now</p>
+              </div>
+              <div className="bg-blue-600/50 p-2 rounded-lg">
+                <p>Yes, I agree!</p>
+              </div>
+            </div>
+            <Avatar className="w-10 h-10 ml-2">
+              <AvatarImage
+                src="https://plus.unsplash.com/premium_photo-1671656349218-5218444643d8?q=80&w=2787&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                alt="Profile Picture"
+              />
+              <AvatarFallback>CN</AvatarFallback>
+            </Avatar>
+          </div>
+        </div>
+
+        {/* Input Field */}
+        <div className="p-4 bg-black/60 border-t border-gray-700 flex items-center">
+          {/* Avatar */}
           <Avatar className="w-10 h-10">
-            <AvatarImage
-              src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8YXZhdGFyfGVufDB8fDB8fHww"
-              alt="Profile Picture"
-            />
-            <AvatarFallback>CN</AvatarFallback>
-          </Avatar>
-          <div className="flex ml-2 -mt-2">
-            <h1 className="text-base text-white font-bold">Bishnu Silwal</h1>
-            <p className="text-base text-gray-300 pl-4">6m</p>
-          </div>
-        </div>
-        <div className="bg-black/50 h-10 w-48 rounded-3xl flex items-center justify-center ml-20 -mt-6">
-          <p className="text-white text-base">Everything is possible</p>
-        </div>
-
-        {/* Second Message */}
-        <div className="flex justify-end mt-12 mr-10">
-          <div className="flex flex-col items-end">
-            <div className="flex items-center">
-              <h1 className="text-base text-white font-bold">You</h1>
-              <p className="text-base text-gray-300 pl-4">5m</p>
-            </div>
-            <div className="bg-blue-600/50 h-10 w-48 rounded-3xl flex items-center justify-center">
-              <p className="text-white text-base">Yes, I agree!</p>
-            </div>
-          </div>
-          <Avatar className="w-10 h-10 ml-2">
             <AvatarImage
               src="https://plus.unsplash.com/premium_photo-1671656349218-5218444643d8?q=80&w=2787&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
               alt="Profile Picture"
             />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
-        </div>
-      </div>
 
-      {/* Input Field */}
-      <div className="flex items-center bg-black/60 p-4 rounded-xl mt-4">
-        {/* Avatar */}
-        <div>
-          <Avatar className="w-10 h-10">
-            <AvatarImage
-              src="https://plus.unsplash.com/premium_photo-1671656349218-5218444643d8?q=80&w=2787&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-              alt="Profile Picture"
-            />
-            <AvatarFallback>CN</AvatarFallback>
-          </Avatar>
-        </div>
-
-        {/* Textarea Field */}
-        <div className="flex-grow mx-4 mt-2">
+          {/* Textarea */}
           <textarea
             rows={1}
             placeholder="Type your message..."
-            className="w-full px-4 py-2 text-white bg-black/40 rounded-lg border border-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none overflow-hidden"
+            className="flex-grow mx-4 px-4 py-2 text-black bg-gray-200 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
             onChange={(e) => {
               const target = e.target as HTMLTextAreaElement;
               target.style.height = "auto";
               target.style.height = `${target.scrollHeight}px`;
             }}
           ></textarea>
-        </div>
 
-        {/* Send Button */}
-        <button className="ml-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-500">
-          Send
-        </button>
+          {/* Send Button */}
+          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-500">
+            Send
+          </button>
+        </div>
       </div>
     </div>
   );

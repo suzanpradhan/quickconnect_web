@@ -1,15 +1,19 @@
-
 export interface ChatTableType {
   id: string;
   name: string;
+  isGroupChat: boolean;
+  createdAt: string;
 }
 
 export interface ChatMemberType {
   id: string;
   chatId: string;
   userId: string;
+  isAdmin: boolean;
+  joinedAt: string;
 }
+
 export interface ChatObject {
-  ChatTable: ChatTableType;
-  ChatMember: ChatMemberType;
+  "chat-table": ChatTableType;  
+  "chat-member": ChatMemberType;  
 }
