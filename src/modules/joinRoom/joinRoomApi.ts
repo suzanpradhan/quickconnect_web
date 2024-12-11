@@ -4,7 +4,7 @@ import { JoinRoomRequest } from "./joinRoomType";
 export const joinRoomApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     joinRoom: builder.mutation<void, JoinRoomRequest>({
-      query: ({ chatId, token }) => {
+      query: ({ chatId }) => {
         
         return {
           url: `${apiPaths.baseUrl}${apiPaths.JoinRoomUrl}/${chatId}`,

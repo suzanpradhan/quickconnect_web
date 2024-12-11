@@ -14,10 +14,15 @@ export interface MessageType {
   }
 
   export const CreateMessagechema = z.object({
-    message: z.string().pipe(nonempty),
+    chatId: z.string().nonempty(),  
+    message: z.string().nonempty(), 
   });
   
-  export type CreateMessageValues = z.infer<typeof CreateMessagechema>;
+  export type SendMessageValues = z.infer<typeof CreateMessagechema>;
   
-  
-  
+  export type SendMessageRequest = {
+    chatId: string;
+    token: string;
+    message:string;
+    // senderName: string;
+  };

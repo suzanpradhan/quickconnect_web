@@ -14,11 +14,8 @@ export default function JoinRoom() {
   const { chatId } = useParams();
   const session = useSession();
   const chatIdString = Array.isArray(chatId) ? chatId[0] : chatId;
-  const handleJoinRoom = async () => {
   
-    console.log("chatId:", chatIdString);
-    console.log("token:", session.data?.user?.accessToken);
-
+  const handleJoinRoom = async () => {
     if (!chatIdString || !session.data?.user?.accessToken) {
       setErrorMessage("Missing chatId or token.");
       return;
