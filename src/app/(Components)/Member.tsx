@@ -1,7 +1,6 @@
 "use client";
-
 import React, { useState } from "react";
-import { User, Search, Cross, X } from "lucide-react"; // Icons from Lucide
+import { User, Search, Cross, X } from "lucide-react"; 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function Member() {

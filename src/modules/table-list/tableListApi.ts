@@ -1,6 +1,6 @@
 import { baseApi } from '@/core/api/apiQuery'; 
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { ChatObject } from './chatListType'; 
+import { ChatObject } from './tableListType'; 
 import { apiPaths } from '@/core/api/apiConstants'; 
 
 export const chatApi = baseApi.injectEndpoints({

@@ -15,7 +15,7 @@ import { File } from "lucide-react";
 import { apiPaths } from "@/core/api/apiConstants";
 import { useToast } from "@/hooks/use-toast";
 import TabMenu from "../(Components)/TabMenu";
-import { chatApi } from "@/modules/member-list/chatListApi";
+import { chatApi } from "@/modules/table-list/tableListApi";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 

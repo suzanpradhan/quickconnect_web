@@ -1,63 +1,111 @@
-"use client"
-import { useEffect, useState } from "react";
+"use client";
+import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/core/redux/clientStore";
-import { chatApi } from "@/modules/member-list/chatListApi";
 import { RootState } from "@/core/redux/store";
-import { ChatObject } from "@/modules/member-list/chatListType"; 
-import { ProfileDataType } from "@/modules/profile/profileType";
-import profileApi from "@/modules/profile/profileApi";
+import { GetAllUsersResponse } from "@/modules/member-list/memberListApi";
+import { memberListApi } from "@/modules/member-list/memberListType";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { User, X, Search } from "lucide-react"; 
+import { apiPaths } from "@/core/api/apiConstants";
 
-const ChatMembers = () => {
+export default function MemberList() {
   const dispatch = useAppDispatch();
-  const [chatId, setChatId] = useState<string | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
 
-  // Fetch Profile Data
-  const profileData = useAppSelector(
+  const memberList = useAppSelector(
     (state: RootState) =>
-      state.baseApi.queries[`getProfileByToken(undefined)`]?.data as ProfileDataType
+      state.baseApi.queries["getMemberList-undefined"]?.data as
+        | GetAllUsersResponse
+        | undefined
   );
 
+
+
+  // Fetch member list on mount
   useEffect(() => {
-    dispatch(profileApi.endpoints.getProfileByToken.initiate());
+    dispatch(memberListApi.endpoints.getMemberList.initiate());
   }, [dispatch]);
 
-  // Fetch Chat Members
-  const chatMembers = useAppSelector(
-    (state: RootState) =>
-      state.baseApi.queries[`getChatDetails-${profileData?.userInfo.id}`]?.data as Array<ChatObject>
-  );
+  const toggleSidebar = () => {
+    setIsOpen((prev) => !prev);
+  };
 
-  useEffect(() => {
-    if (profileData?.userInfo.id) {
-      dispatch(chatApi.endpoints.getChatDetails.initiate(profileData.userInfo.id));
-    }
-  }, [dispatch, profileData?.userInfo.id]);
-
-  // Update chatId dynamically based on chatMembers
-  useEffect(() => {
-    if (chatMembers?.length > 0) {
-      setChatId(chatMembers[0]["chat-table"]?.id || null);
-    }
-  }, [chatMembers]);
-
-  // Loading state
-  if (!chatMembers) return <div>Loading chat members...</div>;
+  // If memberList is undefined, handle the case
+  const users = memberList?.users || [];
 
   return (
-    <div>
-      {chatMembers.map((chatMember, index) => (
-        <div key={index} className="chat-member">
-          <h1 className="text-black">Chat: {chatMember["chat-table"]?.name}</h1>
-          <div>
-            <h2 className="text-black">Chat Members:</h2>
-            <p className="text-black">Member ID: {chatMember["chat-member"]?.userId}</p>
-            <p className="text-black">Is Admin: {chatMember["chat-member"]?.isAdmin ? "Yes" : "No"}</p>
-            <p className="text-black">Joined At: {new Date(chatMember["chat-member"]?.joinedAt).toLocaleString()}</p>
+    <div className="relative h-screen bg-gray-100">
+      <button
+        onClick={toggleSidebar}
+        className="bg-blue-600 text-white p-2 rounded-full hover:bg-blue-500"
+      >
+        <User size={24} />
+      </button>
+
+      {/* Sidebar */}
+      <div
+        className={`fixed top-0 right-0 h-screen w-80 bg-black text-white transform ${
+          isOpen ? "translate-x-0" : "translate-x-full"
+        } transition-transform duration-300 shadow-lg flex flex-col`}
+      >
+        {/* Sidebar Header */}
+        <div className="bg-blue-900 p-4 flex justify-between items-center">
+          <h2 className="text-lg font-bold">People</h2>
+          <button
+            onClick={toggleSidebar}
+            className="text-white hover:text-gray-300"
+          >
+            <X />
+          </button>
+        </div>
+
+        {/* Search Bar */}
+        <div className="flex-grow overflow-y-auto p-4">
+          <div className="relative w-full">
+            <div className="absolute inset-y-0 left-3 flex items-center">
+              <Search size={18} className="text-gray-500" />
+            </div>
+            <input
+              type="text"
+              placeholder="Search..."
+              className="w-full py-2 pl-10 pr-4 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
+          </div>
+
+          <h1 className="mt-4">Member List</h1>
+          <div className="mt-4">
+            {/* Render user list dynamically */}
+            {users.length === 0 ? (
+              <p>No members found.</p>
+            ) : (
+              users.map((user) => {
+
+                const avatarSrc =
+                  user.avatar
+                    ? `${apiPaths.baseUrl}/${user.avatar}`
+                    : ""; 
+
+                return (
+                  <div key={user.id} className="flex items-center mb-4">
+                    <Avatar className="w-10 h-10">
+                      <AvatarImage
+                        src={avatarSrc || undefined} 
+                        alt={user.name || "Profile Picture"}
+                      />
+                      <AvatarFallback>
+                        {user.name ? user.name[0] : "?"} 
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="ml-4">
+                      <h4 className="font-bold">{user.name}</h4>
+                    </div>
+                  </div>
+                );
+              })
+            )}
           </div>
         </div>
-      ))}
+      </div>
     </div>
   );
-};
-
-export default ChatMembers;
+}

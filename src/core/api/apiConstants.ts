@@ -32,6 +32,7 @@ export const  apiPaths = {
   CreatRoomsUrl:"/create-room",
   JoinRoomUrl:"/join-room",
   MessageUrl:"/messages",
-SendmessageUrl:"/send-message"
+  SendmessageUrl:"/send-message",
+  MemberListUrl:"/allUsers",
 };
   

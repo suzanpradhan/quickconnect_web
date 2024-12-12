@@ -1,34 +1,3 @@
-// import { apiPaths } from "@/core/api/apiConstants";
-// import { baseApi } from "@/core/api/apiQuery";
-// import { MessageType, SendMessageValues } from "./messageType";
-
-// export const messageApi = baseApi.injectEndpoints({
-//   endpoints: (builder) => ({
-//     getMessages: builder.query<MessageType[], string>({
-//       query: (chatId) => ({
-//         url: `${apiPaths.baseUrl}${apiPaths.MessageUrl}/${chatId}`, 
-//         method: 'GET',
-//       }),
-//       serializeQueryArgs: ({ endpointName, queryArgs }) => {
-//         return `${endpointName}-${queryArgs}`;
-//       },
-//     }),
-
-//     sendMessage: builder.mutation<{ chatId: string }, SendMessageValues>({
-//       query: ({ chatId, ...payload }) => {
-//         return {
-//           url: `${apiPaths.baseUrl}${apiPaths.SendmessageUrl}/${chatId}`, 
-//           method: "POST",
-//           body: payload, 
-//         };
-//       },
-//     }),
-
-//   }),
-  
-//   overrideExisting: false, 
-// });
-
 
 import { apiPaths } from "@/core/api/apiConstants";
 import { baseApi } from "@/core/api/apiQuery";

@@ -15,13 +15,12 @@ import { File } from "lucide-react";
 import { apiPaths } from "@/core/api/apiConstants";
 import { useToast } from "@/hooks/use-toast";
 import TabMenu from "../(Components)/TabMenu";
-import { chatApi } from "@/modules/member-list/chatListApi";
+import { chatApi } from "@/modules/table-list/tableListApi";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 
 export default function ProfilePage() {
   const dispatch = useAppDispatch();
-
   const genders = ["Male", "Female", "Others"];
   const [avatar, setAvatar] = useState<File | null>(null);
   const { toast } = useToast();
@@ -48,8 +47,8 @@ export default function ProfilePage() {
   const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files ? event.target.files[0] : null;
     if (file) {
-      setAvatar(file); // Set the selected file in the state
-      formik.setFieldValue("avatar", file); // Manually update Formik field value for avatar
+      setAvatar(file); 
+      formik.setFieldValue("avatar", file); 
     }
   };
 
@@ -62,7 +61,7 @@ export default function ProfilePage() {
           name: values.name,
           phoneNumber: values.phoneNumber,
           gender: values.gender,
-          avatar: avatar ?? null, // Send avatar if available, else null
+          avatar: avatar ?? null,
         })
       );
 
@@ -70,6 +69,7 @@ export default function ProfilePage() {
         toast({
           title: "Updated profile successfully.",
           description: "Updated profile successfully.",
+          className: "text-green-500 ",
         });
       } else if ("error" in result) {
         toast({
