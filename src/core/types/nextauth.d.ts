@@ -4,6 +4,7 @@ interface IUser {
   id?: string;
   username?: string | null;
   email?: string | null;
+  avatar?: string | null;
   accessToken: string;
 }
 

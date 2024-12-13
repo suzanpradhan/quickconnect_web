@@ -16,7 +16,7 @@ export const messageApi = baseApi.injectEndpoints({
     }),
 
     sendMessage: builder.mutation<void, SendMessageRequest>({
-      query: ({ chatId, token, message }) => {
+      query: ({ chatId, token, message, name }) => {
         return {
           url: `${apiPaths.baseUrl}${apiPaths.SendmessageUrl}/${chatId}`,
           method: "POST",
@@ -24,7 +24,7 @@ export const messageApi = baseApi.injectEndpoints({
             chatId,
             message,
             token,
-            
+            name
 
           },
         };

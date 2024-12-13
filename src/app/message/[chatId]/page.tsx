@@ -1,117 +1,156 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/core/redux/clientStore";
 import { RootState } from "@/core/redux/store";
 import { MessageType } from "@/modules/message/messageType";
 import { messageApi } from "@/modules/message/messageApi";
 import { useSession } from "next-auth/react";
+import { Avatar } from "@/components/ui/avatar";
+import { MessageSquare } from "lucide-react";
 
 export default function MessagePage() {
   const { chatId } = useParams();
   const dispatch = useAppDispatch();
   const chatIdString = Array.isArray(chatId) ? chatId[0] : chatId;
   const session = useSession();
-  const [newMessage, setNewMessage] = useState<string>(""); 
-  const [errorMessage, setErrorMessage] = useState<string>("");
-  const [isSending, setIsSending] = useState<boolean>(false);
+  const [newMessage, setNewMessage] = useState<string>("");
+  const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  // Select message list from Redux store
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
   const messageList = useAppSelector(
     (state: RootState) =>
-      state.baseApi.queries[`getMessages-${chatIdString}`]?.data as MessageType[]
+      state.baseApi.queries[`getMessages-${chatIdString}`]
+        ?.data as MessageType[]
   );
 
-  // Fetch messages when chatId changes
   useEffect(() => {
     if (chatIdString) {
       dispatch(messageApi.endpoints.getMessages.initiate(chatIdString));
     }
   }, [dispatch, chatIdString]);
 
-  // Handle sending a message
   const handleSendMessage = async () => {
-    if (!chatIdString || !session.data?.user?.accessToken) {
-      setErrorMessage("Missing chatId or token.");
-      return;
-    }
-
-    if (!newMessage.trim()) {
-      setErrorMessage("Message cannot be empty.");
+    if (
+      !chatIdString ||
+      !session.data?.user?.accessToken ||
+      !newMessage.trim()
+    ) {
       return;
     }
 
     try {
-      setIsSending(true);
-      setErrorMessage("");
-
       await dispatch(
         messageApi.endpoints.sendMessage.initiate({
           chatId: chatIdString,
           message: newMessage,
-          token: session.data?.user?.accessToken,
-          // senderName: session?.data?.user?.name || "Unknown User", 
-
+          token: session.data.user.accessToken,
+          name: session.data.user.name || "Unknown User",
         })
       ).unwrap();
 
       setNewMessage("");
+      scrollToBottom();
     } catch (err) {
       console.error("Error sending message:", err);
-      setErrorMessage("Failed to send message. Please try again.");
-    } finally {
-      setIsSending(false);
     }
   };
 
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const toggleSidebar = () => {
+    setIsOpen((prev) => !prev);
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messageList]);
+
   return (
-    <div className="max-w-3xl mx-auto p-4">
-      <h2 className="text-2xl font-semibold mb-4">Messages for Chat ID: {chatIdString}</h2>
+    <div className="flex flex-col h-screen">
+      {/* Chat Icon */}
+      <button
+        onClick={toggleSidebar}
+        className="absolute top-4 right-4 bg-blue-600 text-white p-3 rounded-full hover:bg-blue-500 z-50"
+      >
+        <MessageSquare size={24} />
+      </button>
 
-      {/* Error Message */}
-      {errorMessage && (
-        <div className="text-red-500 mb-4 p-2 border border-red-500 rounded">{errorMessage}</div>
-      )}
+      {/* Chat Window */}
+      {isOpen && (
+        <div className="absolute right-0 top-0 w-1/3 h-full bg-white shadow-lg border-l border-gray-300 flex flex-col z-40">
+          <div className="p-4 bg-blue-600 text-white text-lg font-semibold">
+            Chat Messages
+          </div>
+          <div className="flex-grow overflow-y-auto p-4 space-y-3">
+            {messageList && messageList.length > 0 ? (
+              messageList.map((message: MessageType) => {
+                const isUserMessage =
+                  session?.data?.user?.id &&
+                  message.senderId === session.data.user.id;
 
-      {/* Message List */}
-      {messageList && messageList.length > 0 ? (
-        <ul className="space-y-4">
-          {messageList.map((message: MessageType) => (
-            <li key={message.id} className="p-4 bg-gray-100 rounded-md shadow-sm">
-              <div>
-                <strong className="font-bold">
-                  {message.senderId} 
-                </strong>
-                : {message.message}
-                <span className="text-sm text-gray-500 ml-2">
-                  {new Date(message.createdAt).toLocaleString()}
-                </span>
+                return (
+                  <div
+                    key={message.id}
+                    className={`flex ${
+                      isUserMessage ? "justify-end" : "justify-start"
+                    }`}
+                  >
+                    {!isUserMessage && (
+                      <Avatar className="w-8 h-8 mr-2">
+                        {/* Avatar Placeholder */}
+                      </Avatar>
+                    )}
+                    <div
+                      className={`max-w-xs break-words p-3 rounded-lg shadow-md ${
+                        isUserMessage
+                          ? "bg-blue-600 text-white self-end"
+                          : "bg-gray-200 text-black"
+                      }`}
+                    >
+                      <p className="font-medium">
+                        {isUserMessage
+                          ? "You"
+                          : message.name || "Unknown Sender"}
+                      </p>
+                      <p>{message.message}</p>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <div className="text-gray-600 text-center">
+                No messages available.
               </div>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <div className="text-gray-600">No messages available.</div>
+            )}
+            <div ref={messagesEndRef} />
+          </div>
+          <div className="p-4 border-t border-gray-300 bg-gray-50 flex items-center">
+            <textarea
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              placeholder="Type a message..."
+              rows={1}
+              className="flex-grow p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none overflow-hidden"
+              onInput={(e) => {
+                e.currentTarget.style.height = "auto";
+                e.currentTarget.style.height = `${e.currentTarget.scrollHeight}px`;
+              }}
+            />
+            {newMessage.trim() && (
+              <button
+                onClick={handleSendMessage}
+                className="ml-2 bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700"
+              >
+                Send
+              </button>
+            )}
+          </div>
+        </div>
       )}
-
-      {/* Input to Send Message */}
-      <div className="mt-8">
-        <textarea
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          placeholder="Type your message here..."
-          rows={4}
-          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        ></textarea>
-        <button
-          onClick={handleSendMessage}
-          disabled={isSending}
-          className={`mt-4 w-full p-3 rounded-md text-white ${isSending ? "bg-gray-500" : "bg-blue-600"} hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed`}
-        >
-          {isSending ? "Sending..." : "Send Message"}
-        </button>
-      </div>
     </div>
   );
 }
-
