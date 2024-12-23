@@ -6,8 +6,8 @@ export interface MessageType {
   receiverId: string | null;
   name: string;
   message: string;
-  messageType: string; 
-  createdAt: string; 
+  messageType: string;
+  timestamp: string;
   attachmentURL: string | null;
   mediaType: string | null;
 }
@@ -15,14 +15,12 @@ export interface MessageType {
 export const CreateMessageSchema = z.object({
   chatId: z.string().nonempty(),
   message: z.string().nonempty(),
-  senderName: z.string().nonempty(), 
 });
 
 export type SendMessageValues = z.infer<typeof CreateMessageSchema>;
 
 export type SendMessageRequest = {
   chatId: string;
-  token: string;
   message: string;
-  name: string;  
+  senderId: string;
 };

@@ -41,8 +41,8 @@ const Header = () => {
               </div>
             </div>
 
-            <div className="flex  mt-8 ml-72 items-center">
-              <div className="flex -space-x-2">
+            {/* <div className="flex  mt-8 ml-72 items-center"> */}
+            {/* <div className="flex -space-x-2">
                 <img
                   src="https://plus.unsplash.com/premium_photo-1671656349218-5218444643d8?q=80&w=2787&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                   alt="User 1"
@@ -58,9 +58,9 @@ const Header = () => {
                   alt="User 3"
                   className="w-8 h-8 rounded-full border-2 border-gray-700"
                 />
-              </div>
-              <span className="ml-1 text-sm">+24</span>
-            </div>
+              </div> */}
+            {/* <span className="ml-1 text-sm">+24</span> */}
+            {/* </div> */}
             <button className="bg-gray-700 px-4 py-1 rounded-lg text-sm mt-10 ml-8 ">
               + Add User to Meeting
             </button>
@@ -68,11 +68,11 @@ const Header = () => {
         </div>
 
         {/* Right Section */}
-        <div className="flex items-center  bg-gray-700   rounded-lg text-sm w-[34%] mt-20 justify-between p-1 mr-2">
+        {/* <div className="flex items-center  bg-gray-700   rounded-lg text-sm w-[34%] mt-20 justify-between p-1 mr-2">
           <MessageCircle />
           <button className="">Live Chat</button>
           <ChevronUp />
-        </div>
+        </div> */}
       </div>
 
       {/* Notification and Profile */}

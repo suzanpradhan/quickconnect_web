@@ -6,16 +6,12 @@ import { RootState } from "@/core/redux/store";
 import {
   ProfileFormValues,
   ProfileDataType,
-  profileSchema,
 } from "@/modules/profile/profileType";
-import Link from "next/link";
 import { useFormik } from "formik";
-
 import { File } from "lucide-react";
 import { apiPaths } from "@/core/api/apiConstants";
 import { useToast } from "@/hooks/use-toast";
 import TabMenu from "../(Components)/TabMenu";
-import { chatApi } from "@/modules/table-list/tableListApi";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 

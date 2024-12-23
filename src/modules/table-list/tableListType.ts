@@ -14,6 +14,6 @@ export interface ChatMemberType {
 }
 
 export interface ChatObject {
-  "chat-table": ChatTableType;  
-  "chat-member": ChatMemberType;  
+  "chat-table": ChatTableType;
+  "chat-member": ChatMemberType;
 }

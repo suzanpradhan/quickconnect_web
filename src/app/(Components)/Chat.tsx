@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { Cross, MessageSquare, X } from "lucide-react"; 
+import { Cross, MessageSquare, X } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function ChatSidebar() {
@@ -33,7 +33,7 @@ export default function ChatSidebar() {
             onClick={toggleSidebar}
             className="text-white hover:text-gray-300"
           >
-      <X />
+            <X />
           </button>
         </div>
 

@@ -1,4 +1,5 @@
-import React from "react";
+"use client";
+import React, { useState } from "react";
 import {
   Volume2,
   CircleDot,
@@ -11,9 +12,12 @@ import {
   User,
   Fullscreen,
   ClipboardList,
+  X,
 } from "lucide-react";
 
 const VideoChat = () => {
+  const [isMembersOpen, setIsMembersOpen] = useState(false);
+
   const controls = [
     { label: "Volume", Icon: Volume2 },
     { label: "Record", Icon: CircleDot },
@@ -24,10 +28,15 @@ const VideoChat = () => {
     { label: "Share Link", Icon: Link },
     { label: "Leave", Icon: LogOut },
   ];
+
+  const handleMembersClick = () => {
+    setIsMembersOpen(true);
+  };
+
   return (
-    <div className="flex flex-col h-screen bg-gray-900/60 text-white ">
+    <div className="flex flex-col h-screen max-h-fit bg-gray-900/60 text-white overflow-hidden">
       {/* Main Video */}
-      <div className="flex flex-col items-center px-4">
+      <div className="flex flex-col items-center px-4 flex-none">
         <div className="relative w-full h-96 rounded-lg overflow-hidden">
           <img
             src="https://images.unsplash.com/photo-1725011803245-1bf502fc60a6?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjB8fFBFUlNPTiUyMHBob3RvfGVufDB8fDB8fHww"
@@ -49,8 +58,9 @@ const VideoChat = () => {
           </div>
         </div>
       </div>
+
       {/* Participant Videos */}
-      <div className="flex justify-center space-x-4 p-4 bg-gray-800">
+      <div className="flex justify-center space-x-4 p-4 bg-gray-800 flex-none">
         {[
           {
             name: "Sita silwal",
@@ -82,12 +92,16 @@ const VideoChat = () => {
             )}
           </div>
         ))}
-        <div className="flex items-center justify-center w-28 h-28 bg-gray-700 rounded-lg">
+        <div
+          className="flex items-center justify-center w-28 h-28 bg-gray-700 rounded-lg cursor-pointer"
+          onClick={handleMembersClick}
+        >
           <span className="text-xl text-white">+24</span>
         </div>
       </div>
+
       {/* Controls */}
-      <div className="flex justify-around p-4 bg-gray-800">
+      <div className="flex justify-around p-4 bg-gray-800 flex-none">
         {controls.map(({ label, Icon }, index) => (
           <button
             key={index}
@@ -102,7 +116,27 @@ const VideoChat = () => {
           </button>
         ))}
       </div>
-      
+
+      {/* Member List Sidebar */}
+      {isMembersOpen && (
+        <div className="fixed top-0 right-0 h-[87%] w-80 bg-red-300 text-white transform rounded-b-lg">
+          <div className="bg-blue-900 p-4 flex justify-between items-center">
+            <h2 className="text-lg font-bold">Member List</h2>
+            <button
+              onClick={() => setIsMembersOpen(false)}
+              className="text-white hover:text-gray-300"
+            >
+              <X size={24} />
+            </button>
+          </div>
+          <div className="flex-grow overflow-y-auto p-4">
+            {/* Add your member list content here */}
+            <p className="text-center">
+              List of members will be displayed here.
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

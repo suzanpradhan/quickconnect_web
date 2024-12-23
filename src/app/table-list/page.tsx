@@ -1,9 +1,9 @@
-"use client"
+"use client";
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/core/redux/clientStore";
 import { chatApi } from "@/modules/table-list/tableListApi";
 import { RootState } from "@/core/redux/store";
-import { ChatObject } from "@/modules/table-list/tableListType"; 
+import { ChatObject } from "@/modules/table-list/tableListType";
 import { ProfileDataType } from "@/modules/profile/profileType";
 import profileApi from "@/modules/profile/profileApi";
 
@@ -14,9 +14,10 @@ const ChatMembers = () => {
   // Fetch Profile Data
   const profileData = useAppSelector(
     (state: RootState) =>
-      state.baseApi.queries[`getProfileByToken(undefined)`]?.data as ProfileDataType
+      state.baseApi.queries[`getProfileByToken(undefined)`]
+        ?.data as ProfileDataType
   );
-
+  console.log("profileData", profileData);
   useEffect(() => {
     dispatch(profileApi.endpoints.getProfileByToken.initiate());
   }, [dispatch]);
@@ -24,12 +25,15 @@ const ChatMembers = () => {
   // Fetch Chat Members
   const chatMembers = useAppSelector(
     (state: RootState) =>
-      state.baseApi.queries[`getChatDetails-${profileData?.userInfo.id}`]?.data as Array<ChatObject>
+      state.baseApi.queries[`getChatDetails-${profileData?.userInfo.id}`]
+        ?.data as Array<ChatObject>
   );
 
   useEffect(() => {
     if (profileData?.userInfo.id) {
-      dispatch(chatApi.endpoints.getChatDetails.initiate(profileData.userInfo.id));
+      dispatch(
+        chatApi.endpoints.getChatDetails.initiate(profileData.userInfo.id)
+      );
     }
   }, [dispatch, profileData?.userInfo.id]);
 
@@ -46,13 +50,20 @@ const ChatMembers = () => {
   return (
     <div>
       {chatMembers.map((chatMember, index) => (
-        <div key={index} className="chat-member">
+        <div key={index}>
           <h1 className="text-black">Chat: {chatMember["chat-table"]?.name}</h1>
           <div>
             <h2 className="text-black">Chat Members:</h2>
-            <p className="text-black">Member ID: {chatMember["chat-member"]?.userId}</p>
-            <p className="text-black">Is Admin: {chatMember["chat-member"]?.isAdmin ? "Yes" : "No"}</p>
-            <p className="text-black">Joined At: {new Date(chatMember["chat-member"]?.joinedAt).toLocaleString()}</p>
+            <p className="text-black">
+              Member ID: {chatMember["chat-member"]?.userId}
+            </p>
+            <p className="text-black">
+              Is Admin: {chatMember["chat-member"]?.isAdmin ? "Yes" : "No"}
+            </p>
+            <p className="text-black">
+              Joined At:{" "}
+              {new Date(chatMember["chat-member"]?.joinedAt).toLocaleString()}
+            </p>
           </div>
         </div>
       ))}

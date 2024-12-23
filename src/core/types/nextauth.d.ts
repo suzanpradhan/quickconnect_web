@@ -6,6 +6,7 @@ interface IUser {
   email?: string | null;
   avatar?: string | null;
   accessToken: string;
+  senderId?: string;
 }
 
 declare module "next-auth" {

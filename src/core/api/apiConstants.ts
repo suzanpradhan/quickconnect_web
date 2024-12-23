@@ -18,21 +18,21 @@ export async function setHeaders(headers: Headers) {
   headers.set("accept", "application/json");
   return headers;
 }
-export const  apiPaths = {
+export const apiPaths = {
   serverUrl: process.env.NEXT_PUBLIC_SERVER_URL,
   baseUrl: process.env.NEXT_PUBLIC_SERVER_URL + "/api",
   loginUrl: "/signin",
   registerUrl: "/signup",
-  myProfileUrl: "/userInfo",  
+  myProfileUrl: "/userInfo",
   resetPasswordUrl: "/changePassword",
-  forgotPasswordUrl:"/forgotPassword",
-  createNewPasswordUrl:"/createNewPassword",
-  updateProfileUrl:"/edictUserInfo",
+  forgotPasswordUrl: "/forgotPassword",
+  createNewPasswordUrl: "/createNewPassword",
+  updateProfileUrl: "/edictUserInfo",
   ChatDetailUrl: "/user",
-  CreatRoomsUrl:"/create-room",
-  JoinRoomUrl:"/join-room",
-  MessageUrl:"/messages",
-  SendmessageUrl:"/send-message",
-  MemberListUrl:"/allUsers",
+  CreatRoomsUrl: "/create-room",
+  JoinRoomUrl: "/join-room",
+  MessageUrl: "/messages",
+  SendmessageUrl: "/send-message",
+  MemberListUrl: "/allUsers",
+  DeleteMessageUrl: "/delete-messages",
 };
-  
