@@ -224,7 +224,6 @@ export default function MessagePage() {
                     isUserMessage ? "justify-end" : "justify-start"
                   }`}
                 >
-                  {message.id}
                   {!isUserMessage && <Avatar className="w-8 h-8 mr-2" />}
                   <div
                     className={`group max-w-xs break-words p-3 rounded-lg shadow-md ${

@@ -1,74 +1,59 @@
 "use client";
-import { useEffect, useState } from "react";
+
+import React, { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/core/redux/clientStore";
-import { chatApi } from "@/modules/table-list/tableListApi";
 import { RootState } from "@/core/redux/store";
+
+import { useSession } from "next-auth/react";
 import { ChatObject } from "@/modules/table-list/tableListType";
-import { ProfileDataType } from "@/modules/profile/profileType";
-import profileApi from "@/modules/profile/profileApi";
+import { chatApi } from "@/modules/table-list/tableListApi";
 
-const ChatMembers = () => {
+export default function RoomList() {
   const dispatch = useAppDispatch();
-  const [chatId, setChatId] = useState<string | null>(null);
+  const session = useSession();
+  const userId = session?.data?.user?.id;
 
-  // Fetch Profile Data
-  const profileData = useAppSelector(
+  // Fetch Chat Room List
+  const roomList = useAppSelector(
     (state: RootState) =>
-      state.baseApi.queries[`getProfileByToken(undefined)`]
-        ?.data as ProfileDataType
-  );
-  console.log("profileData", profileData);
-  useEffect(() => {
-    dispatch(profileApi.endpoints.getProfileByToken.initiate());
-  }, [dispatch]);
-
-  // Fetch Chat Members
-  const chatMembers = useAppSelector(
-    (state: RootState) =>
-      state.baseApi.queries[`getChatDetails-${profileData?.userInfo.id}`]
-        ?.data as Array<ChatObject>
+      state.baseApi.queries[`getRoomList-${userId}`]?.data as
+        | ChatObject[]
+        | undefined
   );
 
   useEffect(() => {
-    if (profileData?.userInfo.id) {
-      dispatch(
-        chatApi.endpoints.getChatDetails.initiate(profileData.userInfo.id)
-      );
+    if (userId) {
+      dispatch(chatApi.endpoints.getRoomList.initiate(userId));
     }
-  }, [dispatch, profileData?.userInfo.id]);
+  }, [dispatch, userId]);
 
-  // Update chatId dynamically based on chatMembers
-  useEffect(() => {
-    if (chatMembers?.length > 0) {
-      setChatId(chatMembers[0]["chat-table"]?.id || null);
-    }
-  }, [chatMembers]);
-
-  // Loading state
-  if (!chatMembers) return <div>Loading chat members...</div>;
+  console.log("Room List:", roomList);
 
   return (
-    <div>
-      {chatMembers.map((chatMember, index) => (
-        <div key={index}>
-          <h1 className="text-black">Chat: {chatMember["chat-table"]?.name}</h1>
-          <div>
-            <h2 className="text-black">Chat Members:</h2>
-            <p className="text-black">
-              Member ID: {chatMember["chat-member"]?.userId}
-            </p>
-            <p className="text-black">
-              Is Admin: {chatMember["chat-member"]?.isAdmin ? "Yes" : "No"}
-            </p>
-            <p className="text-black">
-              Joined At:{" "}
-              {new Date(chatMember["chat-member"]?.joinedAt).toLocaleString()}
-            </p>
-          </div>
-        </div>
-      ))}
+    <div className="p-4">
+      {roomList && roomList.length > 0 ? (
+        roomList.map((room, index) => {
+          const chatTable = room["chat_table"];
+          return chatTable ? (
+            <div key={index} className="p-4 border-b">
+              <h1 className="text-black font-semibold">
+                Chat ID: {chatTable.id}
+              </h1>
+              <p>Name: {chatTable.name}</p>
+              <p>Group Chat: {chatTable.isGroupChat ? "Yes" : "No"}</p>
+              <p>
+                Created At: {new Date(chatTable.createdAt).toLocaleString()}
+              </p>
+            </div>
+          ) : (
+            <div key={index} className="p-4 border-b">
+              <p className="text-red-500">Invalid data for this room.</p>
+            </div>
+          );
+        })
+      ) : (
+        <p>No chat rooms found.</p>
+      )}
     </div>
   );
-};
-
-export default ChatMembers;
+}
