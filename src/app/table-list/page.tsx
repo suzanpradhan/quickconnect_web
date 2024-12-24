@@ -12,7 +12,7 @@ export default function RoomList() {
   const dispatch = useAppDispatch();
   const session = useSession();
   const userId = session?.data?.user?.id;
-
+  console.log("userId", userId);
   // Fetch Chat Room List
   const roomList = useAppSelector(
     (state: RootState) =>

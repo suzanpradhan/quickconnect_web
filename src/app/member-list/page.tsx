@@ -5,7 +5,7 @@ import { RootState } from "@/core/redux/store";
 import { GetAllUsersResponse } from "@/modules/member-list/memberListApi";
 import { memberListApi } from "@/modules/member-list/memberListType";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User, X, Search } from "lucide-react"; 
+import { User, X, Search } from "lucide-react";
 import { apiPaths } from "@/core/api/apiConstants";
 
 export default function MemberList() {
@@ -18,8 +18,6 @@ export default function MemberList() {
         | GetAllUsersResponse
         | undefined
   );
-
-
 
   // Fetch member list on mount
   useEffect(() => {
@@ -79,21 +77,19 @@ export default function MemberList() {
               <p>No members found.</p>
             ) : (
               users.map((user) => {
-
-                const avatarSrc =
-                  user.avatar
-                    ? `${apiPaths.baseUrl}/${user.avatar}`
-                    : ""; 
+                const avatarSrc = user.avatar
+                  ? `${apiPaths.baseUrl}/${user.avatar}`
+                  : "";
 
                 return (
                   <div key={user.id} className="flex items-center mb-4">
                     <Avatar className="w-10 h-10">
                       <AvatarImage
-                        src={avatarSrc || undefined} 
+                        src={avatarSrc || undefined}
                         alt={user.name || "Profile Picture"}
                       />
                       <AvatarFallback>
-                        {user.name ? user.name[0] : "?"} 
+                        {user.name ? user.name[0] : "?"}
                       </AvatarFallback>
                     </Avatar>
                     <div className="ml-4">
