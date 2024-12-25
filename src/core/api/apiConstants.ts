@@ -35,4 +35,7 @@ export const apiPaths = {
   SendmessageUrl: "/send-message",
   MemberListUrl: "/allUsers",
   DeleteMessageUrl: "/delete-messages",
+  LogOutUrl: "/log-out",
+  PrivateChatUrl: "/create-private-room",
+  GroupUrl: "/join-room",
 };

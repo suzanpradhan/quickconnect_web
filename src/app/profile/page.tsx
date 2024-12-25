@@ -14,12 +14,14 @@ import { useToast } from "@/hooks/use-toast";
 import TabMenu from "../(Components)/TabMenu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
+import { signOut } from "next-auth/react";
 
 export default function ProfilePage() {
   const dispatch = useAppDispatch();
   const genders = ["Male", "Female", "Others"];
   const [avatar, setAvatar] = useState<File | null>(null);
   const { toast } = useToast();
+  // const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -38,13 +40,12 @@ export default function ProfilePage() {
     fetchData();
   }, [dispatch]);
 
-
   // Handle file change for avatar upload
   const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files ? event.target.files[0] : null;
     if (file) {
-      setAvatar(file); 
-      formik.setFieldValue("avatar", file); 
+      setAvatar(file);
+      formik.setFieldValue("avatar", file);
     }
   };
 
@@ -107,6 +108,21 @@ export default function ProfilePage() {
     ? `${apiPaths.baseUrl}/${profileData?.userInfo.avatar}`
     : ""; // Fallback to default image if no avatar is available
   console.log("avatar", avatarSrc);
+
+  // log out user
+  const handleLogout = async () => {
+    try {
+      const result = await dispatch(profileApi.endpoints.logoutUser.initiate());
+
+      if ("data" in result) {
+        signOut({ callbackUrl: "/login", redirect: true });
+      } else if ("error" in result) {
+        console.log("Logout failed. Please try again.");
+      }
+    } catch (error) {
+      console.error("An error occurred during logout:", error);
+    }
+  };
   return (
     <div className="min-h-screen bg-[#111111] text-white flex">
       <main className="flex-1 p-6 ">
@@ -215,7 +231,7 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row justify-end gap-4 sm:gap-0">
+              <div className="flex flex-col sm:flex-row justify-between gap-4 sm:gap-0">
                 <button
                   type="submit"
                   className="text-white bg-green-500 rounded-md mt-4 p-2 w-full sm:w-auto"
@@ -224,9 +240,15 @@ export default function ProfilePage() {
                 </button>
               </div>
             </form>
+
+            <button
+              onClick={handleLogout}
+              className="text-white bg-red-500 rounded-md mt-4 p-2 w-full sm:w-auto"
+            >
+              LogOut
+            </button>
           </div>
         </div>
-
       </main>
     </div>
   );

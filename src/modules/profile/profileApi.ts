@@ -46,6 +46,14 @@ export const profileApi = baseApi.injectEndpoints({
         }
       },
     }),
+
+    logoutUser: builder.mutation<void, void>({
+      query: () => ({
+        url: `${apiPaths.baseUrl}${apiPaths.LogOutUrl}`,
+        method: "POST",
+        prepareHeaders: async (headers: Headers) => await setHeaders(headers),
+      }),
+    }),
   }),
 });
 
