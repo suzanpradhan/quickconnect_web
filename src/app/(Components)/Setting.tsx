@@ -14,7 +14,7 @@ import { useFormik } from "formik";
 import { File } from "lucide-react";
 import { apiPaths } from "@/core/api/apiConstants";
 import { useToast } from "@/hooks/use-toast";
-import TabMenu from "../(Components)/TabMenu";
+import TabMenu from "./TabMenu";
 import { chatApi } from "@/modules/table-list/tableListApi";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
@@ -42,7 +42,6 @@ export default function ProfilePage() {
     };
     fetchData();
   }, [dispatch]);
-
 
   // Handle file change for avatar upload
   const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -230,7 +229,6 @@ export default function ProfilePage() {
             </form>
           </div>
         </div>
-
       </main>
     </div>
   );

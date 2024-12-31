@@ -28,6 +28,7 @@ export interface Private {
   success: boolean;
   message: string;
   chatId: string;
+  receiverName: string;
 }
 
 export interface Group {

@@ -6,7 +6,17 @@ import { RootState } from "@/core/redux/store";
 import { messageApi } from "@/modules/message/messageApi";
 import { useSession } from "next-auth/react";
 import { Avatar } from "@/components/ui/avatar";
-import { MessageSquare, Trash2 } from "lucide-react";
+
+import {
+  EllipsisVertical,
+  MessageSquare,
+  Phone,
+  Search,
+  Send,
+  Trash2,
+  Users,
+  Video,
+} from "lucide-react";
 import { socket } from "@/config/socket";
 import { useFormik } from "formik";
 import { string, ZodError } from "zod";
@@ -15,14 +25,30 @@ import {
   MessageType,
   SendMessageValues,
 } from "@/modules/message/messageType";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { ChatObject } from "@/modules/table-list/tableListType";
+import { chatApi } from "@/modules/table-list/tableListApi";
 
 export default function MessagePage() {
   const { chatId } = useParams();
+
   const dispatch = useAppDispatch();
   const chatIdString = Array.isArray(chatId) ? chatId[0] : chatId;
   const session = useSession();
+  const userId = session?.data?.user?.id;
   const [isSending, setIsSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   // Fetch the messages for the current chatId from Redux
   const messageList = useAppSelector(
@@ -97,7 +123,6 @@ export default function MessagePage() {
       socket.off("connect", handleConnect);
       socket.off("disconnect", handleDisconnect);
       socket.off("receiveMessage", handleReceiveMessage);
-      // socket.off("deleteMessage", handleDeleteClick);
     };
   }, [chatIdString, dispatch, socket]);
 
@@ -201,15 +226,59 @@ export default function MessagePage() {
     }
   };
 
+  // Helper function to format the timestamp
+  const formatTimestamp = (timestamp: string) => {
+    const messageDate = new Date(timestamp);
+    const today = new Date();
+
+    // If the message is from today, show the time (hour and minute)
+    if (messageDate.toDateString() === today.toDateString()) {
+      return messageDate.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    }
+
+    // If the message is from another day, show the full date
+    return messageDate.toLocaleDateString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
+  // get room name
+  const roomList = useAppSelector(
+    (state: RootState) =>
+      state.baseApi.queries[`getRoomList-${userId}`]?.data as
+        | ChatObject[]
+        | undefined
+  );
+
+  useEffect(() => {
+    if (userId) {
+      dispatch(chatApi.endpoints.getRoomList.initiate(userId));
+    }
+  }, [dispatch, userId]);
+
+  const chatRoom = roomList?.find(
+    (room) => room.chat_table.id === chatIdString
+  );
+  const chatRoomName = chatRoom?.chat_table.name || "Unknown Room";
+  const isGroupChat = chatRoom?.chat_table.isGroupChat;
+
   return (
     <div className="flex flex-col h-screen">
-      <div className="absolute top-4 right-4 bg-blue-600 text-white p-3 rounded-full hover:bg-blue-500 z-50">
-        <MessageSquare size={24} />
-      </div>
-
-      <div className="w-full h-full bg-white shadow-lg border-l border-gray-300 flex flex-col z-40">
-        <div className="p-4 bg-blue-600 text-white text-lg font-semibold">
-          Chat Messages
+      <div className="w-full h-full bg-[#1E1E1E]/85 shadow-lg border-gray-300 flex flex-col z-40">
+        <div className="p-4 bg-blue-600 text-white text-lg font-semibold flex justify-between">
+          <div className="font-medium">{chatRoomName}</div>
+          <div className="flex space-x-4">
+            {isGroupChat && <Users />}
+            <Video />
+            <Phone />
+            <Search />
+          </div>
         </div>
 
         <div className="flex-grow overflow-y-auto p-4 space-y-3">
@@ -224,42 +293,87 @@ export default function MessagePage() {
                     isUserMessage ? "justify-end" : "justify-start"
                   }`}
                 >
-                  {!isUserMessage && <Avatar className="w-8 h-8 mr-2" />}
-                  <div
-                    className={`group max-w-xs break-words p-3 rounded-lg shadow-md ${
-                      isUserMessage
-                        ? "bg-blue-600 text-white"
-                        : "bg-gray-200 text-black"
-                    }`}
-                  >
-                    <p className="font-medium">
-                      {isUserMessage ? "You" : message.name || "Unknown"}
-                    </p>
-                    <p>{message.message}</p>
+                  <div>
+                    {!isUserMessage && <Avatar className="w-8 h-8 mr-2" />}
+                    <div
+                      className={`group max-w-xs break-words p-3 rounded-lg shadow-md ${
+                        isUserMessage
+                          ? "bg-[#6b9b9c] text-black"
+                          : " bg-white text-black"
+                      }`}
+                    >
+                      <p className="font-bold">
+                        {isUserMessage ? "" : message.name}
+                      </p>
 
-                    <p className="text-sm text-gray-500">
-                      {new Date(message.timestamp).toLocaleTimeString()}
-                    </p>
+                      <div className=" flex">
+                        {/* Delete Icon for user messages */}
+                        {isUserMessage && (
+                          <div className="relative group">
+                            <button
+                              className="absolute top-2 right-2 hidden group-hover:block text-white  rounded-full p-1"
+                              onClick={() => setShowDeleteDialog(true)} // Show the confirmation dialog
+                              title="Delete Message"
+                            >
+                              <Trash2 />
+                            </button>
 
-                    {/* Delete Icon */}
-                    {isUserMessage && (
-                      <button
-                        className="absolute top-2 right-2 hidden group-hover:block text-white bg-red-600 rounded-full p-1 hover:bg-red-700"
-                        onClick={() => {
-                          if (
-                            typeof message.id === "string" &&
-                            typeof chatId === "string"
-                          ) {
-                            handleDeleteClick(message.id, chatId);
-                          } else {
-                            console.error("Invalid message ID or chat ID.");
-                          }
-                        }}
-                        title="Delete Message"
-                      >
-                        <Trash2 />
-                      </button>
-                    )}
+                            {/* Alert Dialog for Delete Confirmation */}
+                            {showDeleteDialog && (
+                              <AlertDialog
+                                open={showDeleteDialog}
+                                onOpenChange={setShowDeleteDialog}
+                              >
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>
+                                      Confirm Delete
+                                    </AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      Are you sure you want to delete this
+                                      message? This action cannot be undone.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel
+                                      className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                                      onClick={() => setShowDeleteDialog(false)} // Close the dialog on cancel
+                                    >
+                                      Cancel
+                                    </AlertDialogCancel>
+                                    <AlertDialogAction
+                                      className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                                      onClick={() => {
+                                        if (
+                                          typeof message.id === "string" &&
+                                          typeof chatId === "string"
+                                        ) {
+                                          handleDeleteClick(message.id, chatId);
+                                          setShowDeleteDialog(false); // Close the dialog after deleting
+                                        } else {
+                                          console.error(
+                                            "Invalid message ID or chat ID."
+                                          );
+                                        }
+                                      }}
+                                    >
+                                      Delete
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            )}
+                          </div>
+                        )}
+                        <div className="">
+                          <p>{message.message}</p>
+                        </div>
+                      </div>
+
+                      <p className="text-sm text-gray-600">
+                        {formatTimestamp(message.timestamp)}
+                      </p>
+                    </div>
                   </div>
                 </div>
               );
@@ -274,12 +388,12 @@ export default function MessagePage() {
 
         <form
           onSubmit={formik.handleSubmit}
-          className="p-4 border-t border-gray-300 bg-gray-50 flex items-center"
+          className="p-4  border-gray-300 bg-[#1E1E1E]   flex items-center"
         >
           <textarea
             id="message"
             placeholder="Type your message..."
-            className="flex-grow p-2 border border-gray-300 rounded-lg focus:outline-none resize-none"
+            className="flex-grow p-2 border border-gray-300  text-white  bg-[#222222] rounded-lg focus:outline-none resize-none"
             rows={2}
             {...formik.getFieldProps("message")}
           />
@@ -288,7 +402,7 @@ export default function MessagePage() {
             disabled={!formik.isValid || formik.isSubmitting || isSending}
             className="ml-2 bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-500"
           >
-            Send
+            <Send />
           </button>
         </form>
       </div>

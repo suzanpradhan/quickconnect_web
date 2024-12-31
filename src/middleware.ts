@@ -23,7 +23,10 @@ export async function middleware(req: NextRequest) {
   // Redirect unauthenticated users from `/` or `/profile` to `/login`
   if (!token && (pathname === "/" || pathname === "/profile")) {
     return NextResponse.redirect(
-      new URL(`/login?callback=${encodeURIComponent(req.url)}`, req.nextUrl.origin)
+      new URL(
+        `/login?callback=${encodeURIComponent(req.url)}`,
+        req.nextUrl.origin
+      )
     );
   }
 

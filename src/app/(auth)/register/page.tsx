@@ -1,4 +1,3 @@
-
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -21,7 +20,7 @@ const Register = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast()
+  const { toast } = useToast();
 
   const validateForm = (values: RegisterFormInputs) => {
     try {
@@ -47,7 +46,7 @@ const Register = () => {
         toast({
           title: "Login faild.",
           description: "There was a problem.",
-        })
+        });
       }
     } catch (error) {
       console.error("An error occurred during registration:", error);
@@ -60,7 +59,7 @@ const Register = () => {
       name: "",
       email: "",
       password: "",
-      confirmPassword: "", 
+      confirmPassword: "",
     },
     validateOnChange: true,
     onSubmit,
@@ -81,8 +80,8 @@ const Register = () => {
 
       <div className="w-2/3 bg-[#222222] flex items-center justify-center h-full">
         <div className="max-w-md w-full space-y-8 text-center">
-        <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl font-bold text-blue-500 font-helvetica">
-        QuickConnect
+          <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl font-bold text-blue-500 font-helvetica">
+            QuickConnect
           </h2>
 
           <form
@@ -95,7 +94,7 @@ const Register = () => {
             <Input
               className="text-white bg-[#222222] focus:outline-none"
               placeholder="Enter Your Name"
-               type="name"
+              type="name"
               error={formik.touched.name ? formik.errors.name : undefined}
               {...formik.getFieldProps("name")}
             />
@@ -118,23 +117,22 @@ const Register = () => {
             />
             <Input
               className="text-white bg-[#222222] focus:outline-none"
-              placeholder="Confirm Your Password" 
-              type="password" 
+              placeholder="Confirm Your Password"
+              type="password"
               error={
                 formik.touched.confirmPassword
                   ? formik.errors.confirmPassword
                   : undefined
               }
-              {...formik.getFieldProps("confirmPassword")} 
+              {...formik.getFieldProps("confirmPassword")}
             />
             <button
               type="submit"
               disabled={isLoading}
               className="w-full flex justify-center py-2 px-4 border border-transparent text-sm text-black bg-[#169AD6] font-helvetica font-normal"
             >
-              {isLoading ? "Loading..." : "Register"} 
+              {isLoading ? "Loading..." : "Register"}
             </button>
-            
           </form>
         </div>
       </div>

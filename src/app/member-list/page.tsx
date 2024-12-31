@@ -14,12 +14,12 @@ import roomApi from "@/modules/rooms/roomsApi";
 import { useFormik } from "formik";
 import { Input } from "@/components/ui/input";
 import { useSession } from "next-auth/react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function MemberList() {
   const dispatch = useAppDispatch();
   const session = useSession();
-
-  const [isOpen, setIsOpen] = useState(false);
+  const { toast } = useToast();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [joinLink, setJoinLink] = useState<string | null>(null);
@@ -68,10 +68,6 @@ export default function MemberList() {
     dispatch(memberListApi.endpoints.getMemberList.initiate());
   }, [dispatch]);
 
-  const toggleSidebar = () => {
-    setIsOpen((prev) => !prev);
-  };
-
   // create private room
   const handleCreatePrivateRoom = async (receiverId: string) => {
     try {
@@ -82,18 +78,29 @@ export default function MemberList() {
       if (result.success) {
         router.push(`/message/${result.chatId}`);
       } else {
-        alert(result.message);
+        toast({
+          title: "Scheduled: Catch up",
+          description: "Friday, February 10, 2023 at 5:57 PM",
+        });
       }
     } catch (error) {
       console.error("Error creating private room:", error);
-      alert("Failed to create private room.");
+
+      toast({
+        title: "Failed to create private room.",
+        description: "Friday, February 10, 2023 at 5:57 PM",
+      });
     }
   };
 
   // create group room
   const handleGroupRoom = async (receiverId: string) => {
     if (!joinLink) {
-      alert("Please create a room first.");
+      toast({
+        title: "Please create a room first.",
+        description: "",
+      });
+
       return;
     }
 
@@ -131,29 +138,8 @@ export default function MemberList() {
   const users = memberList?.users || [];
 
   return (
-    <div className="relative h-screen bg-gray-100">
-      <button
-        onClick={toggleSidebar}
-        className="bg-blue-600 text-white p-2 rounded-full hover:bg-blue-500"
-      >
-        <User size={24} />
-      </button>
-
-      <div
-        className={`fixed top-0 right-0 h-screen w-80 bg-black text-white transform ${
-          isOpen ? "translate-x-0" : "translate-x-full"
-        } transition-transform duration-300 shadow-lg flex flex-col`}
-      >
-        <div className="bg-blue-900 p-4 flex justify-between items-center">
-          <h2 className="text-lg font-bold">People</h2>
-          <button
-            onClick={toggleSidebar}
-            className="text-white hover:text-gray-300"
-          >
-            <X />
-          </button>
-        </div>
-
+    <>
+      <div className="relative w-full h-screen bg-gray-100 ">
         <div className="p-4">
           <h2 className="text-xl font-bold mb-4">Create Rooms</h2>
           <form
@@ -196,19 +182,19 @@ export default function MemberList() {
         </div>
 
         <div className="p-4 flex-grow overflow-y-auto">
-          <h3 className="font-bold mb-4">Member List</h3>
-          {users.length === 0 ? (
+          <h3 className="font-bold mb-4">All Users</h3>
+          {users.filter((user) => user.id !== loggedInUserId).length === 0 ? (
             <p>No members found.</p>
           ) : (
-            users.map((user) => {
-              const isMember = groupMembers.includes(user.id);
-              const isCurrentUser = user.id === loggedInUserId;
+            users
+              .filter((user) => user.id !== loggedInUserId)
+              .map((user) => {
+                const isMember = groupMembers.includes(user.id);
 
-              return (
-                <div key={user.id} className="flex items-center mb-4">
-                  <div className="ml-4 flex justify-between">
-                    <h4 className="font-bold">{user.name}</h4>
-                    {!isCurrentUser && (
+                return (
+                  <div key={user.id} className="flex items-center mb-4">
+                    <div className="ml-4 flex justify-between">
+                      <h4 className="font-bold">{user.name}</h4>
                       <>
                         <button
                           onClick={() => handleCreatePrivateRoom(user.id)}
@@ -225,15 +211,16 @@ export default function MemberList() {
                           </button>
                         )}
                       </>
-                    )}
-                    {isMember && <p className="ml-10 text-green-400">Joined</p>}
+                      {isMember && (
+                        <p className="ml-10 text-green-400">Joined</p>
+                      )}
+                    </div>
                   </div>
-                </div>
-              );
-            })
+                );
+              })
           )}
         </div>
       </div>
-    </div>
+    </>
   );
 }

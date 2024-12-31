@@ -5,7 +5,13 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { Users, Building2, UserCircle, AlignJustify } from "lucide-react";
+import {
+  Users,
+  Building2,
+  UserCircle,
+  AlignJustify,
+  MessageCircleMore,
+} from "lucide-react";
 import Link from "next/link";
 
 export default function Sidebar() {
@@ -32,7 +38,7 @@ export default function Sidebar() {
             {/* Rooms */}
             <div className="flex items-center gap-4 w-full text-left p-2 rounded bg-blue-500 hover:bg-blue-600 text-white">
               <Users className="w-6 h-6 text-white" />
-              <Link href="/rooms">
+              <Link href="/table-list">
                 <span>Rooms</span>
               </Link>
             </div>
@@ -52,10 +58,20 @@ export default function Sidebar() {
             <div className="flex items-center gap-4">
               <UserCircle className="w-6 h-6 text-white" />
               <Link
-                href="/my-account"
+                href="/profile"
                 className="w-full text-left p-2 rounded flex items-center hover:bg-gray-700"
               >
                 <span className="text-white">My Account</span>
+              </Link>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <MessageCircleMore className="w-6 h-6 text-white" />
+              <Link
+                href="/member-list"
+                className="w-full text-left p-2 rounded flex items-center hover:bg-gray-700"
+              >
+                <span className="text-white">Messsage</span>
               </Link>
             </div>
           </div>
