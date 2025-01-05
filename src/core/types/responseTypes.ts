@@ -1,12 +1,23 @@
 export interface PaginatedResponseType<T> {
-    pagination: PaginationType;
-    results: T[];
-  }
-  
-  export interface PaginationType {
-    next: string | null;
-    previous: string | null;
-    count: number;
-    total_page: number;
-    current_page: number;
-  }                     
+  messages: T[];
+  // pagination: PaginationInfo;
+  limit: number;
+  page: number;
+  totalMessages: number;
+  totalPages: number;
+}
+
+export interface PaginationInfo {}
+
+export interface MessageType {
+  id: string;
+  chatId: string;
+  senderId: string;
+  receiverId: string | null;
+  name: string;
+  message: string;
+  messageType: string;
+  createdAt: string;
+  attachmentURL: string | null;
+  mediaType: string | null;
+}

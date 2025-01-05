@@ -1,30 +1,34 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useParams } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/core/redux/clientStore";
 import { RootState } from "@/core/redux/store";
 import { messageApi } from "@/modules/message/messageApi";
 import { useSession } from "next-auth/react";
 import { Avatar } from "@/components/ui/avatar";
-
 import {
-  EllipsisVertical,
-  MessageSquare,
   Phone,
   Search,
   Send,
   Trash2,
   Users,
   Video,
+  File,
+  FileVideo2,
+  Plus,
 } from "lucide-react";
 import { socket } from "@/config/socket";
 import { useFormik } from "formik";
 import { string, ZodError } from "zod";
 import {
   CreateMessageSchema,
-  MessageType,
   SendMessageValues,
 } from "@/modules/message/messageType";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -38,10 +42,13 @@ import {
 } from "@/components/ui/alert-dialog";
 import { ChatObject } from "@/modules/table-list/tableListType";
 import { chatApi } from "@/modules/table-list/tableListApi";
+import { PaginatedResponseType, MessageType } from "@/core/types/responseTypes";
+import { GetAllUsersResponse } from "@/modules/member-list/memberListApi";
+import { memberListApi } from "@/modules/member-list/memberListType";
+import { roomMembersApi } from "@/modules/room-members/roomMemberApi";
 
 export default function MessagePage() {
   const { chatId } = useParams();
-
   const dispatch = useAppDispatch();
   const chatIdString = Array.isArray(chatId) ? chatId[0] : chatId;
   const session = useSession();
@@ -49,25 +56,99 @@ export default function MessagePage() {
   const [isSending, setIsSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  // const [messages, setMessages] = useState<MessageType[]>([]);
+  const [showMembers, setShowMembers] = useState(false);
+  const [groupMembers, setGroupMembers] = useState<string[]>([]);
+  const limit = 10;
+  // const [hasMoreData, setHasMoreData] = useState(true);
+  const [page, setPage] = useState(1);
+  const scrollableDivRef = useRef<any>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Fetch the messages for the current chatId from Redux
-  const messageList = useAppSelector(
+  const messageData = useAppSelector(
     (state: RootState) =>
-      state.baseApi.queries[`getMessages-${chatIdString}`]?.data as
-        | MessageType[]
-        | undefined
+      state.baseApi.queries[`getMessages-${chatIdString}`]
+        ?.data as PaginatedResponseType<MessageType>
   );
 
-  // Fetch messages when chatId changes
-  useEffect(() => {
-    if (chatIdString) {
-      dispatch(messageApi.endpoints.getMessages.initiate(chatIdString));
-    }
-  }, [dispatch, chatIdString]);
+  console.log("here", messageData);
 
+  // Fetch Messages with Pagination
+  // const fetchMessages = useCallback(async () => {
+  //   if (isLoading || !hasMoreData) return;
+
+  //   try {
+  //     const response = await dispatch(
+  //       messageApi.endpoints.getMessages.initiate({
+  //         chatId: chatIdString || "",
+  //         limit,
+  //         page,
+  //       })
+  //     ).unwrap();
+
+  //     if (response?.messages?.length > 0) {
+  //       setMessages((prevMessages) => [...response.messages, ...prevMessages]);
+  //     }
+
+  //     if (response.pagination.page >= response.pagination.totalPages) {
+  //       setHasMoreData(false);
+  //     }
+  //   } catch (error) {
+  //     // console.error("Error fetching messages:", error);
+  //   }
+  // }, [chatId, dispatch, hasMoreData, isLoading, limit, page]);
+
+  const handleScroll = useCallback(async () => {
+    const scrollableDiv = scrollableDivRef.current;
+
+    if (scrollableDiv.scrollTop <= 10 && !isLoading) {
+      setPage((prevPage) => prevPage + 1);
+      console.log("scrollTop", page);
+    }
+  }, [isLoading]);
+
+  useEffect(() => {
+    const scrollableDiv = scrollableDivRef.current;
+    if (scrollableDiv) {
+      scrollableDiv.addEventListener("scroll", handleScroll);
+    }
+    return () => {
+      if (scrollableDiv) {
+        scrollableDiv.removeEventListener("scroll", handleScroll);
+      }
+    };
+  }, [handleScroll]);
+
+  useEffect(() => {
+    const fetchData = async (page: number) => {
+      console.log("page", page);
+      const response = await Promise.resolve(
+        dispatch(
+          messageApi.endpoints.getMessages.initiate({
+            chatId: chatIdString || "",
+            limit,
+            page,
+          })
+        )
+      );
+      // if (response.data) {
+      //   if (response.data!.page >= response.data!.totalPages) {
+      //     setHasMoreData(false);
+      //   }
+      //   console.log("DATA", response.data);
+      // }
+    };
+
+    if (messageData ? messageData?.page >= messageData?.totalPages : true) {
+      setIsLoading(true);
+      fetchData(page);
+      setIsLoading(false);
+    }
+  }, [page, dispatch]);
+
+  // join the chat room when the mounts
   useEffect(() => {
     if (!chatIdString || !socket) return;
-
     const handleConnect = () => {
       console.log("Socket connected:", socket.connected);
       socket.emit("joinChat", chatIdString);
@@ -88,19 +169,19 @@ export default function MessagePage() {
         return;
       }
 
-      console.log("Received message:", data);
+      // console.log("Received message:", data);
 
       dispatch(
         messageApi.util.updateQueryData(
           "getMessages",
-          chatIdString,
+          { chatId: chatIdString, limit: limit, page: page },
           (draft) => {
-            draft.push({
+            draft.messages.push({
               id: Date.now().toString(),
               senderId: data.senderId,
               name: data.name,
               message: data.message,
-              timestamp: data.timestamp,
+              createdAt: data.timestamp,
               chatId: chatIdString,
               receiverId: "",
               messageType: "text",
@@ -110,7 +191,6 @@ export default function MessagePage() {
           }
         )
       );
-      scrollToBottom();
     };
 
     // Setup socket listeners
@@ -124,16 +204,15 @@ export default function MessagePage() {
       socket.off("disconnect", handleDisconnect);
       socket.off("receiveMessage", handleReceiveMessage);
     };
-  }, [chatIdString, dispatch, socket]);
+  }, [chatIdString, dispatch]);
 
   // Scroll to the bottom when a new message is added
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
   useEffect(() => {
-    scrollToBottom();
-  }, [messageList]);
+    if (messagesEndRef.current) {
+      // Direct scroll without animation
+      messagesEndRef.current.scrollIntoView({ behavior: "auto" });
+    }
+  }, [messageData]);
 
   const formik = useFormik<SendMessageValues>({
     initialValues: {
@@ -157,7 +236,6 @@ export default function MessagePage() {
         setIsSending(true);
 
         if (socket.connected) {
-          // Socket is connected; emit the message directly
           console.log("Socket is connected, emitting message...");
           socket.emit("sendMessage", {
             chatId: chatIdString,
@@ -174,16 +252,29 @@ export default function MessagePage() {
               message: values.message.trim(),
               senderId: session.data.user.id,
             })
-          );
+          ).unwrap();
 
-          if (!response) {
-            console.error("API failed to send the message.");
-            return;
-          }
+          // Ensure the response is of type MessageType
+          // if (response) {
+          //   dispatch(
+          //     messageApi.util.updateQueryData(
+          //       "getMessages",
+          //       {
+          //         chatId: chatIdString || "",
+          // limit: parseInt(limit),
+          // page: page,
+          //       },
+          //       (draft) => {
+          //         draft.messages.push(response as MessageType);
+          //       }
+          //     )
+          //   );
+          // } else {
+          //   console.error("API failed to send the message.");
+          // }
         }
 
         resetForm(); // Reset the form after submitting
-        scrollToBottom(); // Scroll to the latest message
       } catch (error) {
         console.error("Error sending message:", error);
         // Optional: Display an error message to the user.
@@ -192,9 +283,6 @@ export default function MessagePage() {
       }
     },
   });
-
-  // socket.on("deleteMessage", handleDeleteClick);
-  // socket.emit("deleteMessage", handleDeleteClick);
 
   const handleDeleteClick = async (messageId: string, chatId: string) => {
     try {
@@ -212,11 +300,13 @@ export default function MessagePage() {
       dispatch(
         messageApi.util.updateQueryData(
           "getMessages",
-          chatIdString || "",
-          (draft: MessageType[]) => {
-            const index = draft.findIndex((msg) => msg.id === messageId);
+          { chatId, limit, page },
+          (draft) => {
+            const index = draft.messages.findIndex(
+              (msg) => msg.id === messageId
+            );
             if (index !== -1) {
-              draft.splice(index, 1);
+              draft.messages.splice(index, 1);
             }
           }
         )
@@ -268,22 +358,137 @@ export default function MessagePage() {
   const chatRoomName = chatRoom?.chat_table.name || "Unknown Room";
   const isGroupChat = chatRoom?.chat_table.isGroupChat;
 
+  //member list on group room
+  const memberList = useAppSelector(
+    (state: RootState) =>
+      state.baseApi.queries["getMemberList-undefined"]?.data as
+        | GetAllUsersResponse
+        | undefined
+  );
+
+  useEffect(() => {
+    dispatch(memberListApi.endpoints.getMemberList.initiate());
+  }, [dispatch]);
+
+  const toggleMemberList = () => {
+    setShowMembers((prev) => !prev);
+  };
+
+  const roomMembers = useAppSelector(
+    (state: RootState) =>
+      state.baseApi.queries[`getRoomMembers-${chatIdString}`]?.data as
+        | ChatData
+        | undefined
+  );
+
+  useEffect(() => {
+    if (chatIdString) {
+      dispatch(roomMembersApi.endpoints.getRoomMembers.initiate(chatIdString));
+    }
+  }, [dispatch, chatIdString]);
+
   return (
     <div className="flex flex-col h-screen">
-      <div className="w-full h-full bg-[#1E1E1E]/85 shadow-lg border-gray-300 flex flex-col z-40">
-        <div className="p-4 bg-blue-600 text-white text-lg font-semibold flex justify-between">
+      <div className="w-full h-full  shadow-lg bg-[#1b1b1d] border-gray-300 flex flex-col z-40">
+        <div className="p-4 bg-[#242526] text-white text-lg font-semibold flex justify-between">
           <div className="font-medium">{chatRoomName}</div>
-          <div className="flex space-x-4">
-            {isGroupChat && <Users />}
+          <div className="flex space-x-4 text-white text-4xl ">
             <Video />
             <Phone />
             <Search />
+            {isGroupChat && (
+              <Users
+                onClick={toggleMemberList}
+                className="cursor-pointer hover:text-blue-500"
+              />
+            )}
           </div>
         </div>
 
-        <div className="flex-grow overflow-y-auto p-4 space-y-3">
-          {messageList && messageList.length > 0 ? (
-            messageList.map((message) => {
+        {showMembers && (
+          <div className="absolute top-16 right-4 bg-[#222222] shadow-lg text-white rounded-xl w-64 z-50">
+            <h3 className="text-lg font-semibold text-white p-4 bg-[#2c2929] ">
+              Join Requests
+            </h3>
+
+            <ul className="max-h-64 overflow-y-auto ">
+              {memberList?.users
+                .filter((user) => {
+                  // Exclude users who are already in the roomMembers list
+                  const isAlreadyMember = roomMembers?.members.some(
+                    (member) => member.userId === user.id
+                  );
+                  return user.id !== userId && !isAlreadyMember;
+                })
+                .map((user) => {
+                  return (
+                    <div key={user.id} className="items-center mb-4 px-4">
+                      <div className="flex">
+                        <h4 className="text-white">{user.name}</h4>
+                        <div className="ml-auto flex">
+                          <button
+                            onClick={() => {
+                              setGroupMembers((prev) => [...prev, user.id]);
+                            }}
+                            className="text-blue-400 hover:text-blue-600"
+                          >
+                            <Plus size={20} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+            </ul>
+
+            <h3 className="text-lg font-semibold text-white p-4 bg-[#2c2929] ">
+              Member Connect
+            </h3>
+
+            <ul className="max-h-64 overflow-y-auto ">
+              {roomMembers?.members
+                .filter(
+                  (member) =>
+                    member.chatId === chatIdString && member.userId !== userId
+                )
+                .map((member) => {
+                  const isMember = groupMembers.includes(member.userId);
+
+                  return (
+                    <div key={member.id} className=" items-center mb-4 px-4 ">
+                      <div className="flex">
+                        <h4 className=" text-white">{member.memberName}</h4>
+                        <div className="ml-auto flex">
+                          {isMember ? (
+                            <button
+                              onClick={() => {
+                                setGroupMembers((prev) => [...prev, member.id]);
+                              }}
+                              className="text-blue-400 hover:text-blue-600"
+                            >
+                              {/* <Plus size={20} /> */}
+                            </button>
+                          ) : (
+                            <p className="text-green-400">Joined</p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+            </ul>
+          </div>
+        )}
+
+        <div
+          className="flex-grow overflow-y-auto p-4 space-y-3"
+          ref={scrollableDivRef}
+          onScroll={handleScroll}
+        >
+          {messageData &&
+          Array.isArray(messageData.messages) &&
+          messageData.messages.length > 0 ? (
+            messageData.messages.map((message) => {
               const isUserMessage =
                 session?.data?.user?.id === message.senderId;
               return (
@@ -291,21 +496,20 @@ export default function MessagePage() {
                   key={message.id}
                   className={`relative flex ${
                     isUserMessage ? "justify-end" : "justify-start"
-                  }`}
+                  } `}
                 >
                   <div>
                     {!isUserMessage && <Avatar className="w-8 h-8 mr-2" />}
                     <div
                       className={`group max-w-xs break-words p-3 rounded-lg shadow-md ${
                         isUserMessage
-                          ? "bg-[#6b9b9c] text-black"
+                          ? "bg-blue-300 text-black"
                           : " bg-white text-black"
                       }`}
                     >
-                      <p className="font-bold">
+                      <p className="font-bold text-green-700">
                         {isUserMessage ? "" : message.name}
                       </p>
-
                       <div className=" flex">
                         {/* Delete Icon for user messages */}
                         {isUserMessage && (
@@ -369,9 +573,8 @@ export default function MessagePage() {
                           <p>{message.message}</p>
                         </div>
                       </div>
-
                       <p className="text-sm text-gray-600">
-                        {formatTimestamp(message.timestamp)}
+                        {formatTimestamp(message.createdAt)}
                       </p>
                     </div>
                   </div>
@@ -388,12 +591,31 @@ export default function MessagePage() {
 
         <form
           onSubmit={formik.handleSubmit}
-          className="p-4  border-gray-300 bg-[#1E1E1E]   flex items-center"
+          className="p-4 border-gray-300 bg-[#1E1E1E] flex items-center"
         >
+          <Popover>
+            <PopoverTrigger>
+              <Plus className="ml-2 bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-500" />
+            </PopoverTrigger>
+            <PopoverContent className="p-4 bg-[#282A36] text-white rounded-lg shadow-lg w-40 border-2 border-none">
+              <div className="flex flex-col ">
+                <div className="flex justify-evenly hover:bg-gray-600  p-2 cursor-pointer">
+                  <File className="text-blue-600" />
+                  <p>Files</p>
+                </div>
+
+                <div className="flex justify-evenly mt-4 hover:bg-gray-600 p-2 cursor-pointer">
+                  <FileVideo2 className="text-blue-600" />
+                  <p>Videos</p>
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
+
           <textarea
             id="message"
             placeholder="Type your message..."
-            className="flex-grow p-2 border border-gray-300  text-white  bg-[#222222] rounded-lg focus:outline-none resize-none"
+            className="flex-grow p-2 border border-gray-300 text-white bg-[#222222] rounded-lg focus:outline-none resize-none"
             rows={2}
             {...formik.getFieldProps("message")}
           />

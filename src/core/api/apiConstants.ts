@@ -38,4 +38,5 @@ export const apiPaths = {
   LogOutUrl: "/log-out",
   PrivateChatUrl: "/create-private-room",
   GroupUrl: "/join-room",
+  SendMediaUrl: "/send-media",
 };

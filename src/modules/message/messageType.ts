@@ -7,7 +7,7 @@ export interface MessageType {
   name: string;
   message: string;
   messageType: string;
-  timestamp: string;
+  createdAt: string;
   attachmentURL: string | null;
   mediaType: string | null;
 }

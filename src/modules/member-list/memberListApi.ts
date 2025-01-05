@@ -18,12 +18,6 @@ export interface GetAllUsersResponse {
   users: User[];
 }
 
-// export const privateSchema = z.object({
-//   chatName: z.string().optional().nullable(),
-// });
-
-// export type PrivateFormInputs = z.infer<typeof privateSchema>;
-
 export interface Private {
   success: boolean;
   message: string;

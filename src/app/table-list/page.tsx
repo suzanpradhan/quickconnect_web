@@ -22,7 +22,7 @@ export default function RoomList() {
         | ChatObject[]
         | undefined
   );
-
+  console.log("roomlist", roomList);
   useEffect(() => {
     if (userId) {
       dispatch(chatApi.endpoints.getRoomList.initiate(userId));
@@ -46,24 +46,26 @@ export default function RoomList() {
 
   return (
     <div className="p-4 bg-[#111111] h-screen text-white">
-      <div className="grid grid-cols-2 gap-4">
+      <div className="md:flex sm:gap-16">
         {/* Private Rooms */}
-        <div className="w-[90%]">
-          <h2 className="text-xl font-semibold mb-4">Private Rooms</h2>
+        <div className="w-[60%]">
+          <h2 className="text-xl font-bold mb-4">Private Rooms</h2>
           {privateRooms && privateRooms.length > 0 ? (
             privateRooms.map((room, index) => {
               const chatTable = room.chat_table;
               return (
                 <div
                   key={index}
-                  className="p-4 bg-[#1A1A1A] shadow-md border-l-4 border-green-500 rounded-md mb-4"
+                  className="p-4 bg-[#1A1A1A] shadow-md border-x-2 border-green-500 rounded-md mb-4"
                 >
                   <div className="flex items-center justify-between whitespace-nowrap">
                     <div>
-                      <h1 className="text-lg font-semibold whitespace-nowrap">
+                      {/* <h1 className="text-lg  whitespace-nowrap">
                         Chat ID: {chatTable.id}
-                      </h1>
-                      <p className="text-sm">Name: {chatTable.name}</p>
+                      </h1> */}
+                      <p className="text-sm whitespace-nowrap">
+                        Name: {chatTable.name}
+                      </p>
                       <p className="text-sm">
                         Created At:{" "}
                         {new Date(chatTable.createdAt).toLocaleString()}
@@ -83,30 +85,30 @@ export default function RoomList() {
         </div>
 
         {/* Group Rooms */}
-        <div className=" w-[90%]">
-          <h2 className="text-xl font-semibold mb-4 ">Group Rooms</h2>
+        <div className=" w-[60%]">
+          <h2 className="text-xl font-bold mb-4 ">Group Rooms</h2>
           {groupRooms && groupRooms.length > 0 ? (
             groupRooms.map((room, index) => {
               const chatTable = room.chat_table;
               return (
                 <div
                   key={index}
-                  className="p-4 bg-[#222222] shadow-lg border-l-4 border-blue-500 rounded-md mb-4"
+                  className="p-4 bg-[#222222] shadow-lg border-x-2 border-blue-500 rounded-md mb-4"
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <h1 className="text-lg font-semibold">
-                        Chat ID: {chatTable.id}
-                      </h1>
+                      {/* <h1 className="text-lg">
+                        Chat ID: <>{chatTable.id}</>
+                      </h1> */}
                       <p className="text-sm">Name: {chatTable.name}</p>
-                      <p className="text-sm">
+                      <p className="text-sm whitespace-nowrap">
                         Created At:{" "}
                         {new Date(chatTable.createdAt).toLocaleString()}
                       </p>
                     </div>
                     {/* <UsersRound className="text-green-500 text-2xl cursor-pointer" /> */}
                     <MessageSquare
-                      className="text-green-500 text-2xl cursor-pointer"
+                      className="text-blue-500 text-2xl cursor-pointer"
                       onClick={() => handleRoomNavigation(chatTable.id)}
                     />
                   </div>

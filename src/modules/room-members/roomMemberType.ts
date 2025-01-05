@@ -23,7 +23,7 @@ type Message = {
   name: string;
   message: string;
   messageType: "text" | "attachment";
-  timestamp: string;
+  createdAt: string;
   attachmentURL: string | null;
   mediaType: string | null;
 };

@@ -5,24 +5,33 @@ import {
   SendMessageValues,
   SendMessageRequest,
 } from "./messageType";
+import build from "next/dist/build";
+import {
+  PaginationInfo,
+  PaginatedResponseType,
+} from "@/core/types/responseTypes";
 
 export const messageApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     // Get messages endpoint
-    getMessages: builder.query<MessageType[], string>({
-      query: (chatId) => ({
+    getMessages: builder.query<
+      PaginatedResponseType<MessageType>,
+      { chatId: string; limit: number; page: number }
+    >({
+      query: ({ chatId, limit, page }) => ({
         url: `${apiPaths.baseUrl}${apiPaths.MessageUrl}/${chatId}`,
         method: "GET",
+        params: {
+          limit,
+          page,
+        },
       }),
       serializeQueryArgs: ({ endpointName, queryArgs }) => {
-        return `${endpointName}-${queryArgs}`;
-      },
-      // Automatically refetch data when the chatId changes
-      forceRefetch({ currentArg, previousArg }) {
-        return currentArg !== previousArg;
+        console.log(queryArgs.chatId);
+
+        return `${endpointName}-${queryArgs.chatId}`;
       },
     }),
-
     // Send message endpoint
     sendMessage: builder.mutation<void, SendMessageRequest>({
       query: ({ chatId, message, senderId }) => {
@@ -44,7 +53,6 @@ export const messageApi = baseApi.injectEndpoints({
       { messageId: string; chatId: string }
     >({
       query: ({ messageId, chatId }) => {
-        console.log("dfgdfgfg", messageId);
         return {
           url: `${apiPaths.baseUrl}${apiPaths.DeleteMessageUrl}/${chatId}/${messageId}`,
           method: "DELETE",

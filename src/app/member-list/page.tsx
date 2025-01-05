@@ -24,6 +24,7 @@ export default function MemberList() {
   const [isLoading, setIsLoading] = useState(false);
   const [joinLink, setJoinLink] = useState<string | null>(null);
   const [groupMembers, setGroupMembers] = useState<string[]>([]);
+  const [show, setShow] = useState(false);
   const loggedInUserId = session.data?.user?.id;
 
   const validateForm = (values: CreateRoomValues) => {
@@ -139,8 +140,8 @@ export default function MemberList() {
 
   return (
     <>
-      <div className="relative w-full h-screen bg-gray-100 ">
-        <div className="p-4">
+      <div className="p-4 bg-[#111111] h-screen text-white">
+        <div className="p-4 mb-4 flex-grow overflow-y-auto bg-[#222222] w-1/3 border-2 shadow-lg rounded-xl border-gray-400">
           <h2 className="text-xl font-bold mb-4">Create Rooms</h2>
           <form
             className="flex flex-col gap-4"
@@ -162,18 +163,17 @@ export default function MemberList() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-2 px-4 border border-transparent text-sm text-white font-bold bg-[#169AD6] rounded-xl"
+              className="w-full py-2 px-4 border border-transparent text-sm text-white font-bold bg-green-800 rounded-xl"
             >
               {isLoading ? "Loading..." : "Create Room"}
             </button>
           </form>
 
           {joinLink && (
-            <div className="mt-4">
-              <p>Room Created</p>
+            <div className="mt-4 flex justify-center">
               <button
                 onClick={() => router.push(`/message/${joinLink}`)}
-                className="text-blue-500"
+                className="text-green-500"
               >
                 Go to Room
               </button>
@@ -181,8 +181,10 @@ export default function MemberList() {
           )}
         </div>
 
-        <div className="p-4 flex-grow overflow-y-auto">
-          <h3 className="font-bold mb-4">All Users</h3>
+        <div className="p-4 flex-grow overflow-y-auto bg-[#222222] w-1/3 border-2 shadow-lg rounded-xl border-gray-400">
+          <h3 className="font-bold mb-4 text-xl flex items-center justify-center">
+            All Users
+          </h3>
           {users.filter((user) => user.id !== loggedInUserId).length === 0 ? (
             <p>No members found.</p>
           ) : (
@@ -192,22 +194,22 @@ export default function MemberList() {
                 const isMember = groupMembers.includes(user.id);
 
                 return (
-                  <div key={user.id} className="flex items-center mb-4">
-                    <div className="ml-4 flex justify-between">
+                  <div key={user.id} className=" mb-4 ">
+                    <div className="ml-4 flex justify-evenly">
                       <h4 className="font-bold">{user.name}</h4>
                       <>
                         <button
                           onClick={() => handleCreatePrivateRoom(user.id)}
                           className="text-blue-400 hover:text-blue-600 ml-10"
                         >
-                          <MessageCircle size={20} />
+                          <MessageCircle size={20} className="text-green-500" />
                         </button>
                         {!isMember && (
                           <button
                             onClick={() => handleGroupRoom(user.id)}
                             className="text-blue-400 hover:text-blue-600 ml-10"
                           >
-                            <Plus size={20} />
+                            <Plus size={20} className="text-green-500" />
                           </button>
                         )}
                       </>
