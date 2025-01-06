@@ -16,6 +16,7 @@ import {
   File,
   FileVideo2,
   Plus,
+  MessageCircle,
 } from "lucide-react";
 import { socket } from "@/config/socket";
 import { useFormik } from "formik";
@@ -48,6 +49,7 @@ import { memberListApi } from "@/modules/member-list/memberListType";
 import { roomMembersApi } from "@/modules/room-members/roomMemberApi";
 
 export default function MessagePage() {
+  const [animatingUser, setAnimatingUser] = useState<string | null>(null);
   const { chatId } = useParams();
   const dispatch = useAppDispatch();
   const chatIdString = Array.isArray(chatId) ? chatId[0] : chatId;
@@ -58,12 +60,12 @@ export default function MessagePage() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   // const [messages, setMessages] = useState<MessageType[]>([]);
   const [showMembers, setShowMembers] = useState(false);
-  const [groupMembers, setGroupMembers] = useState<string[]>([]);
   const limit = 10;
   // const [hasMoreData, setHasMoreData] = useState(true);
   const [page, setPage] = useState(1);
   const scrollableDivRef = useRef<any>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const messageData = useAppSelector(
     (state: RootState) =>
@@ -387,6 +389,26 @@ export default function MessagePage() {
     }
   }, [dispatch, chatIdString]);
 
+  const handleGroupRoom = async (receiverId: string) => {
+    try {
+      const result = await dispatch(
+        memberListApi.endpoints.createGroupRoom.initiate({
+          chatId: chatIdString || "",
+          receiverId,
+        })
+      ).unwrap();
+
+      if (result.message) {
+        alert(result.message);
+      } else {
+        setError("Failed to join the group.");
+      }
+    } catch (error) {
+      console.error("Error creating group room:", error);
+      setError("Failed to join the group.");
+    }
+  };
+
   return (
     <div className="flex flex-col h-screen">
       <div className="w-full h-full  shadow-lg bg-[#1b1b1d] border-gray-300 flex flex-col z-40">
@@ -407,75 +429,38 @@ export default function MessagePage() {
 
         {showMembers && (
           <div className="absolute top-16 right-4 bg-[#222222] shadow-lg text-white rounded-xl w-64 z-50">
-            <h3 className="text-lg font-semibold text-white p-4 bg-[#2c2929] ">
-              Join Requests
+            <h3 className="text-lg font-semibold text-white p-4 bg-[#2c2929]">
+              Members
             </h3>
 
-            <ul className="max-h-64 overflow-y-auto ">
-              {memberList?.users
-                .filter((user) => {
-                  // Exclude users who are already in the roomMembers list
-                  const isAlreadyMember = roomMembers?.members.some(
-                    (member) => member.userId === user.id
-                  );
-                  return user.id !== userId && !isAlreadyMember;
-                })
-                .map((user) => {
-                  return (
-                    <div key={user.id} className="items-center mb-4 px-4">
-                      <div className="flex">
-                        <h4 className="text-white">{user.name}</h4>
-                        <div className="ml-auto flex">
-                          <button
-                            onClick={() => {
-                              setGroupMembers((prev) => [...prev, user.id]);
-                            }}
-                            className="text-blue-400 hover:text-blue-600"
-                          >
-                            <Plus size={20} />
-                          </button>
-                        </div>
-                      </div>
+            <ul className="max-h-64 overflow-y-auto">
+              {memberList?.users.map((user) => {
+                const isAlreadyMember = roomMembers?.members.some(
+                  (member) => member.userId === user.id
+                );
+
+                const isLoginUser = user.id === userId;
+
+                return (
+                  <li key={user.id} className="">
+                    <div className="ml-4 flex justify-between items-center">
+                      <h4 className="font-bold">{user.name}</h4>
+                      {isLoginUser ? (
+                        <p className="text-green-400 ml-10">Admin</p>
+                      ) : isAlreadyMember ? (
+                        <p className="text-green-400 ml-10">Joined</p>
+                      ) : (
+                        <button
+                          onClick={() => handleGroupRoom(user.id)}
+                          className="text-blue-400 hover:text-blue-600 ml-10"
+                        >
+                          <Plus size={20} className="text-green-500" />
+                        </button>
+                      )}
                     </div>
-                  );
-                })}
-            </ul>
-
-            <h3 className="text-lg font-semibold text-white p-4 bg-[#2c2929] ">
-              Member Connect
-            </h3>
-
-            <ul className="max-h-64 overflow-y-auto ">
-              {roomMembers?.members
-                .filter(
-                  (member) =>
-                    member.chatId === chatIdString && member.userId !== userId
-                )
-                .map((member) => {
-                  const isMember = groupMembers.includes(member.userId);
-
-                  return (
-                    <div key={member.id} className=" items-center mb-4 px-4 ">
-                      <div className="flex">
-                        <h4 className=" text-white">{member.memberName}</h4>
-                        <div className="ml-auto flex">
-                          {isMember ? (
-                            <button
-                              onClick={() => {
-                                setGroupMembers((prev) => [...prev, member.id]);
-                              }}
-                              className="text-blue-400 hover:text-blue-600"
-                            >
-                              {/* <Plus size={20} /> */}
-                            </button>
-                          ) : (
-                            <p className="text-green-400">Joined</p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
+                  </li>
+                );
+              })}
             </ul>
           </div>
         )}

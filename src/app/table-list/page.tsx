@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { ChatObject } from "@/modules/table-list/tableListType";
 import { chatApi } from "@/modules/table-list/tableListApi";
-import { MessageSquare, UsersRound } from "lucide-react";
+import { MessageSquare, Trash2, UsersRound } from "lucide-react";
 
 export default function RoomList() {
   const router = useRouter();
@@ -42,7 +42,6 @@ export default function RoomList() {
   const handleRoomNavigation = (chatId: string) => {
     router.push(`/message/${chatId}`);
   };
-  const memberList = () => {};
 
   return (
     <div className="p-4 bg-[#111111] h-screen text-white">
@@ -107,10 +106,13 @@ export default function RoomList() {
                       </p>
                     </div>
                     {/* <UsersRound className="text-green-500 text-2xl cursor-pointer" /> */}
-                    <MessageSquare
-                      className="text-blue-500 text-2xl cursor-pointer"
-                      onClick={() => handleRoomNavigation(chatTable.id)}
-                    />
+                    <div className="flex  items-center gap-4">
+                      <MessageSquare
+                        className="hover:text-blue-500 text-2xl cursor-pointer"
+                        onClick={() => handleRoomNavigation(chatTable.id)}
+                      />
+                      <Trash2 className="hover:text-blue-500 text-2xl cursor-pointe" />
+                    </div>
                   </div>
                 </div>
               );

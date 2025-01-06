@@ -7,8 +7,6 @@ export const baseApi = createApi({
     baseUrl: `${apiPaths.baseUrl}`,
     prepareHeaders: async (headers: Headers) => await setHeaders(headers),
   }),
-  tagTypes: [
-    "register",
-  ],
+  tagTypes: ["register", "JoinedMembers"],
   endpoints: () => ({}),
 });

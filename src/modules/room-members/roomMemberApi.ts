@@ -8,6 +8,21 @@ export const roomMembersApi = baseApi.injectEndpoints({
         url: `${apiPaths.baseUrl}/${chatId}`,
         method: "GET",
       }),
+
+      providesTags: (result) =>
+        result
+          ? [
+              { type: "register", id: "ALL" },
+              ...result.members.map(
+                (user) =>
+                  ({
+                    type: "register",
+                    id: user.id,
+                  } as const)
+              ),
+            ]
+          : [{ type: "register", id: "ALL" }],
+
       serializeQueryArgs: ({ endpointName, queryArgs }) => {
         return `${endpointName}-${queryArgs}`;
       },
