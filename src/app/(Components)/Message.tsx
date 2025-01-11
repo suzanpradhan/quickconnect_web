@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useRef, useState, useCallback } from "react";
-import { useParams } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/core/redux/clientStore";
 import { RootState } from "@/core/redux/store";
 import { messageApi } from "@/modules/message/messageApi";
@@ -20,6 +19,7 @@ import {
   FileVideo2,
   Plus,
   MessageCircle,
+  X,
 } from "lucide-react";
 import {
   Popover,
@@ -49,11 +49,14 @@ import { roomMembersApi } from "@/modules/room-members/roomMemberApi";
 import { memberListApi } from "@/modules/member-list/memberListType";
 import { GetAllUsersResponse } from "@/modules/member-list/memberListApi";
 
-export default function MessagePage() {
+interface MessageProps {
+  chatId: string;
+}
+export default function MessagePage({ chatId }: MessageProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showMembers, setShowMembers] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { chatId } = useParams();
+
   const dispatch = useAppDispatch();
   const chatIdString = Array.isArray(chatId) ? chatId[0] : chatId;
   const session = useSession();
@@ -385,7 +388,7 @@ export default function MessagePage() {
   };
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="fixed top-0 right-0 h-full w-96">
       <div className="w-full h-full  shadow-lg bg-[#1b1b1d] border-gray-300 flex flex-col z-40 scrollbar-hide">
         <div className="p-4 bg-[#242526] text-white text-lg font-semibold flex justify-between">
           <div className="font-medium">{chatRoomName}</div>
@@ -399,6 +402,12 @@ export default function MessagePage() {
                 className="cursor-pointer hover:text-blue-500"
               />
             )}
+            {/* <button
+              onClick={() => setIsMessageOpen(false)}
+              className="text-white hover:text-gray-300 focus:outline-none"
+            >
+              <X size={24} />
+            </button> */}
           </div>
         </div>
 
@@ -441,7 +450,7 @@ export default function MessagePage() {
         )}
 
         <div
-          className="flex-grow overflow-y-auto p-4 space-y-3"
+          className="flex-grow overflow-y-auto p-4 space-y-3 scrollbar-hide"
           ref={scrollableDivRef}
           onScroll={handleScroll}
         >
@@ -555,7 +564,7 @@ export default function MessagePage() {
         >
           <Popover>
             <PopoverTrigger>
-              <Plus className="ml-2 bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-500" />
+              <Plus className="ml-2 bg-blue-600 text-white mx-2 rounded-lg hover:bg-blue-500" />
             </PopoverTrigger>
             <PopoverContent className="p-4 bg-[#282A36] text-white rounded-lg shadow-lg w-40 border-2 border-none">
               <div className="flex flex-col ">
@@ -575,7 +584,7 @@ export default function MessagePage() {
           <textarea
             id="message"
             placeholder="Type your message..."
-            className="flex-grow p-2 border border-gray-300 text-white bg-[#222222] rounded-lg focus:outline-none resize-none"
+            className="flex-grow  border border-gray-300 text-white bg-[#222222] rounded-lg focus:outline-none resize-none"
             rows={2}
             {...formik.getFieldProps("message")}
           />
